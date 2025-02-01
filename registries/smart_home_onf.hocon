@@ -15,7 +15,7 @@ Do not mention what you can NOT do. Only mention what you can do.
 When you receive an inquiry, you will:
 1. If you are clearly not the right agent for this type of inquiry, reply you're not relevant.
 2. If there is a chance you're relevant, call your down-chain agents to determine if they can answer all or part of the inquiry.
-   Do not assume what the down-chain agents can do. Always call them. You'll be surprised.
+   Do not assume what your down-chain agents can do. Always call them. You'll be surprised.
 3. Deterime which down-chain agents have the strongest claims to the inquiry. If the inquiry is ambiguous, ask for clarification.
 4. Call the relevant down-chain agents and:
    - ask them for follow-up information if needed,
@@ -92,41 +92,112 @@ An assistant that answer inquiries from the user.
 Your name is SmartHouseAssistant. Answer inquiries related to the smart home.
 {aaosa_instructions}
             """,
-            "tools": ["TV", "Lights", "Book"]
+            # Anonymizing the tool names to force the assistant to send Determine inquiries to all tools.
+            # One tool has a clear name to check if the assistant can skip calling it if not relevant.
+            "tools": ["Device_1", "Device_2", "Device_3", "Radio"]
         },
         {
-            "name": "TV",
+            "name": "Device_1",
             "function": "aaosa_call",
             "instructions": """
 {instructions_prefix}
-Your name is TV.
-You can turn the TV on and off.
+Your name is Device_1.
+You can turn the TV on or off by calling your tools.
 {aaosa_instructions}
             """,
             "command": "aaosa_command",
-            "tools": []
+            "tools": ["TV_Switch"]
         },
         {
-            "name": "Lights",
+            "name": "Device_2",
             "function": "aaosa_call",
             "instructions": """
 {instructions_prefix}
-Your name is Lights.
-You can turn the lights on and off.
+Your name is Device_2.
+You can turn lights on or off.
 {aaosa_instructions}
             """,
             "command": "aaosa_command"
+            "tools": ["LivingRoomLights", "KitchenLights"]
         },
         {
-            "name": "Book",
+            "name": "Device_3",
             "function": "aaosa_call",
             "instructions": """
 {instructions_prefix}
-Your name is Book.
+Your name is Device_3.
 You can't do anything. You're a book.
 {aaosa_instructions}
             """,
             "command": "aaosa_command"
         },
+//        {
+//            "name": "Oven",
+//            "function": "aaosa_call",
+//            "instructions": """
+//{instructions_prefix}
+//Your name is Oven.
+//You can turn the oven on or off.
+//{aaosa_instructions}
+//            """,
+//            "command": "aaosa_command"
+//        },
+        {
+            "name": "Radio",
+            "function": "aaosa_call",
+            "instructions": """
+{instructions_prefix}
+Your name is Radio.
+You can turn the radio on or off.
+{aaosa_instructions}
+            """,
+            "command": "aaosa_command"
+        },
+        {
+            "name": "LivingRoomLights",
+            "function": "aaosa_call",
+            "instructions": """
+{instructions_prefix}
+Your name is LivingRoomLights.
+You can turn the lights on or off in the living room.
+{aaosa_instructions}
+            """,
+            "command": "aaosa_command"
+            "tools": []
+        },
+        {
+            "name": "KitchenLights",
+            "function": "aaosa_call",
+            "instructions": """
+{instructions_prefix}
+Your name is KitchenLights.
+You can turn the lights on or off in the kitchen.
+{aaosa_instructions}
+            """,
+            "command": "aaosa_command"
+            "tools": []
+        },
+        {
+            "name": "TV_Switch",
+            "function": {
+                "description": """
+Your name is TV_Switch
+You are an API that turns the TV ON or OFF.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "desired_status": {
+                            "type": "string",
+                            "description": "ON to turn the tv on, OFF to turn it off."
+                        },
+                    },
+                    "required": ["desired_status"]
+                }
+            },
+            "class": "tv_switch.TVSwitch",
+            "command": "Call the API to turn the TV on or off"
+        },
+
     ]
 }
