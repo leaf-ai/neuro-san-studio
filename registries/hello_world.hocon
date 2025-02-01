@@ -1,0 +1,91 @@
+
+# Copyright (C) 2023-2025 Cognizant Digital Business, Evolutionary AI.
+# All Rights Reserved.
+# Issued under the Academic Public License.
+#
+# You can be released from the terms, and requirements of the Academic Public
+# License by purchasing a commercial license.
+# Purchase of a commercial license is mandatory for any use of the
+# neuro-san SDK Software in commercial settings.
+#
+# END COPYRIGHT
+{
+    "llm_config": {
+        "model_name": "gpt-4o",
+        "verbose": true
+    },
+    "tools": [
+        # These tool definitions do not have to be in any particular order
+        # How they are linked and call each other is defined within their
+        # own specs.  This could be a graph, potentially even with cycles.
+
+        # This first guy is the "Front Man".  He is identified as such because
+        # he is the only one with no parameters in his function definition,
+        # and therefore he needs to talk to the outside world to get things rolling.
+        {
+            "name": "announcer",
+
+            # Note that there are no parameters defined for this guy's "function" key.
+            # This is the primary way to identify this tool as a front-man,
+            # distinguishing it from the rest of the tools.
+
+            "function": {
+
+                # When there are no function parameters to the front-man,
+                # its description acts as an initial prompt. 
+
+                "description": """
+I can help you to make a terse anouncement.
+Tell me what your target audience is, and what sentiment you would like to relate.
+"""
+            },
+
+            "instructions": """
+You are an author of terse announcements.
+You will be asked to help writing an extremely terse announcement on behalf of a person or organization.
+You will ascertain the intended sentiment of the desired announcement
+as well as who the target audience is for the announcement
+and come up with something as short as possible to express the sentiment to the audience,
+while never divulging the identity or nature of who has requested the announcement.
+Then, after you have come up with what to say, you will always call a function
+to make the announcement as simple and concise as possible, yet eloquent.
+The synonymizer will need a name for the speech.
+""",
+            "tools": ["synonymizer"]
+        },
+
+        # The synonymizer is the lowest level tool and does not call anyone else.
+        # He is called by the front-man.
+        {
+            "name": "synonymizer",
+            "function": {
+                "description": "Returns sequences of synonyms.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "A brief description of the input"
+                        },
+                        "input_string": {
+                            "type": "string",
+                            "description": "Words, phrases, or sentences to use as input"
+                        }
+                    },
+                    "required": ["input_string", "name"]
+                }
+            },
+            "instructions": """
+You are a thesaurus.
+You will be handed an arbitrary number of words in a particular order
+and for each word in the sequence, you will find a synonym for it
+that is only 5 letters long.
+If no synonym exists for a word in the sequence, only then may you simply use the original word.
+Your output will be words or phrases that match the original form and order of the input,
+except the synonyms will replace the original input words.
+There will be no elaboration or additional commentary.
+""",
+            "command": "Find a synonym string given the input_string"
+        }
+    ]
+}
