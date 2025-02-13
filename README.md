@@ -103,7 +103,7 @@ python -m neuro_san_web_client.app
 #### Option 2: Command line interface
 
 ```bash
-python -m neuro_san.client.agent_cli --connection service --agent onec_assistant
+python -m neuro_san.client.agent_cli --connection service --agent hello_world
 ```
 
 ### Query the client
