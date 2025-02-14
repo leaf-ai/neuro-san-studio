@@ -184,4 +184,33 @@ tool_registries found: ['agent_network_A', 'agent_network_C']
 | *_api_key   | api key value or environment variable to reference to allow access to the LLM provider if different from hosting environment default. |
 | temperature | optional level of randomness 0.0-1.0 to use for LLM results                                                                           |
 
+### Multi-agent networks
+
+TODO
+
+### Coded tools
+
+#### Simple tool
+
+#### API calling tool
+
+#### Sly data
+
+### Toolbox
+
+RAG
+DB connectors
+
+### Logging and debugging
+
+### Advanced
+
+#### Sub networks
+
+#### AAOSA
+
+#### Connect with other agent frameworks
+
+e.g. crewAI, AutoGen, LangGraph, etc.
+AgentForce, ServiceNow, 
 
