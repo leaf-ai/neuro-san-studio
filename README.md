@@ -85,12 +85,7 @@ Type `quit` to exit the client.
 
 #### Option 2: Web client
 
-You can also start a web client to interact with the agent network. From another terminal, navigate to the repo's folder and activate the virtual environment:
-```bash
-source venv/bin/activate && export PYTHONPATH=`pwd`
-```
-
-Then start the web client:
+You can also start a web client instead to interact with the agent network:
 
 ```bash
 python -m neuro_san_web_client.app
