@@ -196,6 +196,11 @@ TODO
 
 #### Sly data
 
+Specific data can be passed to CodeTools via the `sly_data` dictionary.
+The `sly_data` dictionary can be passed along with the chat_request from the client side.
+The LLMs won’t see the `sly_data`, but the coded tools can access it.
+Useful to hold onto a user id and tokens for instance.
+
 ### Toolbox
 
 RAG
