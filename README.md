@@ -126,3 +126,62 @@ Read the instructions of these 2 agents to see what they do.
 Feel free to modify the instructions to see how the agent network behaves.
 
 We'll come back to the structure of .hocon files later.
+
+### Hello World - custom LLMs
+
+TODO
+
+### Hocon files
+
+#### Manifest
+
+A manifest file is a list of agent network configurations that the server will load.
+
+It's simple dictionary where the keys are the names of the agent network configuration files
+and the values are booleans. For instance:
+```hocon
+{
+    "agent_network_A.hocon": true,
+    "agetn_network_B.hocon": false,
+    "agent_network_C.hocon": true,
+}
+```
+In this example the server will load agent networks A and C but not B.
+
+When you start the server, you can see which agent networks have been loaded by looking at the logs:
+```
+> python -m neuro_san.service.agent_main_loop --port 30011
+
+tool_registries found: ['agent_network_A', 'agent_network_C']
+```
+
+#### Agent network
+
+##### Agent specifications
+
+| **Field**            | **Description**                                                                                                                              |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| agent_name           | text handle for other agent specs and hosting system to refer to                                                                             |
+| function             | Open AI function spec (standard) that formally describes the various inputs that the agent expects                                           |
+| generic_instructions | text that sets up the agent in detail for its task                                                                                           |
+| message              | text that sets the agent in motion after it receives all its inputs                                                                          |
+| tools                | optional list of references to other agents that this agent is allowed to call in the course of working through their input and instructions |
+| llm_config           | optional agent-specification for different LLMs for different purposes such as specialization, costs, etc.                                   |
+
+##### Tool specifications
+
+| **Field**     | **Description**                                                                                   |
+|---------------|---------------------------------------------------------------------------------------------------|
+| agent_name    | text handle for other agent specs to refer to                                                     |
+| function      | Open AI function spec (standard) that formally describes the various inputs that the tool expects |
+| method        | Code reference to the function that is to be invoked when the tool is called.                     |
+
+##### LLM specifications
+
+| **Field**   | **Description**                                                                                                                       |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| model_name  | name of the model to use (i.e. “gpt-4o”, “claude-3-haiku”)                                                                            |
+| *_api_key   | api key value or environment variable to reference to allow access to the LLM provider if different from hosting environment default. |
+| temperature | optional level of randomness 0.0-1.0 to use for LLM results                                                                           |
+
+
