@@ -28,7 +28,7 @@ Install the requirements:
 pip install -r requirements.txt
 ```
 
-**IMPORTANT**: By default the service relies on OpenAI's `gpt-4o` model. 
+**IMPORTANT**: By default the server relies on OpenAI's `gpt-4o` model. 
 Set the OpenAI API key, and add it to your shell configuration so it's available in future sessions:  
 **NOTE**: Replace `XXX` with your actual OpenAI API key.  
 **NOTE**: This is OS dependent. This command is for MacOS and Linux.
@@ -39,34 +39,7 @@ Other models are supported too but will require proper setup.
 
 ## Run
 
-Start the server and the client in one single command:
-```bash
-python -m run
-```
-The client and server logs will show on the screen,
-and will also be saved to `logs/server.log` and `logs/client.log` respectively.
-
-As a default, on a web browser you can now navigate to http://127.0.0.1:5003/ to start using the application.
-
-To see the various config options for this app, on terminal
-```bash
-python -m run -h
-```
-or
-```bash
-python -m run --help
-```
-
-## (Optional) How to run in demo-mode
-
-This is really meant to experience some of the default multi-agent networks that are available in the neuro-san library.
-To use it, start the server and the client in one single command:
-```bash
-python -m run --demo-mode
-```
-
-## (Optional) Details for manual run
-
+### Start the server
 
 Export the following environment variables:
 ```bash
@@ -76,17 +49,7 @@ export AGENT_MANIFEST_FILE="./registries/manifest.hocon"
 export AGENT_TOOL_PATH="./coded_tools"
 ```
 
-Configure the Absence Manager API.
-Note: if you do not have access to the Absence Manager API, you can skip this step.
-The coded tools will return a mock response instead of calling the API.
-```bash
-# Absence Manager configuration
-export ABSENCE_MANAGER_CLIENT_ID="XXX"
-export ABSENCE_MANAGER_CLIENT_SECRET="XXX"
-export ASSOCIATE_ID="XXX"
-```
-
-### Start the server
+and start the server:
 
 ```bash
 python -m neuro_san.service.agent_main_loop --port 30011
@@ -94,20 +57,21 @@ python -m neuro_san.service.agent_main_loop --port 30011
 
 ### Start the client
 
-#### Option 1: Web client
+#### Option 1: Command line interface
 
+From another terminal, navigate to the repo's folder and activate the virtual environment:
 ```bash
-python -m neuro_san_web_client.app
+source venv/bin/activate && export PYTHONPATH=`pwd`
 ```
 
-#### Option 2: Command line interface
+Then start the client:
 
 ```bash
 python -m neuro_san.client.agent_cli --connection service --agent hello_world
 ```
 
 ### Query the client
-Once the client is started, you can ask it questions. For example:
+When prompted, ask a question to the agent network. For example:
 ```
 I am travelling to a new planet and wish to send greetings to the orb.
 ```
@@ -116,3 +80,52 @@ And it should return something like:
     Hello, world.
 
 ... but you are dealing with LLMs. Your results will vary!
+
+Type `quit` to exit the client.
+
+#### Option 2: Web client
+
+You can also start a web client to interact with the agent network. From another terminal, navigate to the repo's folder and activate the virtual environment:
+```bash
+source venv/bin/activate && export PYTHONPATH=`pwd`
+```
+
+Then start the web client:
+
+```bash
+python -m neuro_san_web_client.app
+```
+
+Then navigate to http://127.0.0.1:5001 in your browser.
+You can now type your message in the chat box and press 'Send' to interact with the agent network.
+
+## Tutorial
+
+### Hello World
+
+The `hello_world` agent network is a simple agent network that returns a greeting when prompted.
+
+The steps to start the server and the client are describe above.
+When starting, the first thing the server will do is load the agent network configurations
+from the a "manifest" file. The manifest file is specified by the `AGENT_MANIFEST_FILE` environment variable:
+```
+AGENT_MANIFEST_FILE="./registries/manifest.hocon"
+```
+Open [./registries/manifest.hocon](./registries/manifest.hocon) and look at its contents. It should look something like this:
+```hocon
+{
+    # Currently we list each hocon file we want to serve as a key with a boolean value.
+    # Eventually we might have a dictionary value with server specifications for each.
+    "hello_world.hocon": true,
+    # ...
+}
+```
+This tells the server to load the `hello_world.hocon` file from the same `/registries` folder.
+Open [./registries/hello_world.hocon](./registries/hello_world.hocon) and have a look at it.
+For now just note that it contains a "Front Man",
+called "announcer", which is the entry point to the agent network.
+The "announcer" tool, or agent, has 1 tool at its disposal, called "synonymizer".
+Read the instructions of these 2 agents to see what they do.
+Feel free to modify the instructions to see how the agent network behaves.
+
+We'll come back to the structure of .hocon files later.
