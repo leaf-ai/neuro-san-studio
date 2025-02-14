@@ -184,4 +184,53 @@ tool_registries found: ['agent_network_A', 'agent_network_C']
 | *_api_key   | api key value or environment variable to reference to allow access to the LLM provider if different from hosting environment default. |
 | temperature | optional level of randomness 0.0-1.0 to use for LLM results                                                                           |
 
+### Multi-agent networks
+
+TODO
+
+### Coded tools
+
+#### Simple tool
+
+#### API calling tool
+
+#### Sly data
+
+Specific data can be passed to CodeTools via the `sly_data` dictionary.
+The `sly_data` dictionary can be passed along with the chat_request from the client side.
+The LLMs won’t see the `sly_data`, but the coded tools can access it.
+Useful to hold onto a user id and tokens for instance.
+
+### Toolbox
+
+RAG
+DB connectors
+
+### Logging and debugging
+
+### Advanced
+
+#### Sub networks
+
+#### AAOSA
+
+AAOSA stands for Adaptive Agent Oriented Software Architecture.
+
+In this architecture, agents decide if they can answer inquiries or if they need to call other agents to help them.
+
+Reference:
+[Iterative Statistical Language Model Generation for Use with an
+Agent-Oriented Natural Language Interface ](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=3004005f1e736815b367be83f2f90cc0fa9e0411)
+
+<!-- (https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=011fb718658d611294613286c0f4b143aed40f43) -->
+
+Look at [./registries/smart_home.one.hocon](./registries/smart_home_onf.hocon) and in particular:
+- aaosa_instructions
+- aaosa_call
+- aaosa_command
+
+#### Connect with other agent frameworks
+
+e.g. crewAI, AutoGen, LangGraph, etc.
+AgentForce, ServiceNow, 
 
