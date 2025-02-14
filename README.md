@@ -92,6 +92,7 @@ python -m neuro_san_web_client.app
 ```
 
 Then navigate to http://127.0.0.1:5001 in your browser.
+
 You can now type your message in the chat box and press 'Send' to interact with the agent network.
 
 ## Tutorial
@@ -100,9 +101,9 @@ You can now type your message in the chat box and press 'Send' to interact with 
 
 The `hello_world` agent network is a simple agent network that returns a greeting when prompted.
 
-The steps to start the server and the client are describe above.
+The steps to start the server and the client are described above.
 When starting, the first thing the server will do is load the agent network configurations
-from the a "manifest" file. The manifest file is specified by the `AGENT_MANIFEST_FILE` environment variable:
+from the "manifest" file. The manifest file is specified by the `AGENT_MANIFEST_FILE` environment variable:
 ```
 AGENT_MANIFEST_FILE="./registries/manifest.hocon"
 ```
@@ -116,10 +117,11 @@ Open [./registries/manifest.hocon](./registries/manifest.hocon) and look at its 
 }
 ```
 This tells the server to load the `hello_world.hocon` file from the same `/registries` folder.
+
 Open [./registries/hello_world.hocon](./registries/hello_world.hocon) and have a look at it.
 For now just note that it contains a "Front Man",
 called "announcer", which is the entry point to the agent network.
-The "announcer" tool, or agent, has 1 tool at its disposal, called "synonymizer".
+The "announcer" tool, also known as an "agent", has 1 tool at its disposal (another agent), called "synonymizer".
 Read the instructions of these 2 agents to see what they do.
 Feel free to modify the instructions to see how the agent network behaves.
 
