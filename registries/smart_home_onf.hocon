@@ -106,7 +106,7 @@ You can turn the TV on or off by calling your tools.
 {aaosa_instructions}
             """,
             "command": "aaosa_command",
-            "tools": ["TV_Switch"]
+            "tools": ["TV_Switch_API"]
         },
         {
             "name": "Lights",
@@ -163,7 +163,7 @@ You can turn the lights on or off in the living room.
 {aaosa_instructions}
             """,
             "command": "aaosa_command"
-            "tools": []
+            "tools": ["LivingRoom_Switch_API"]
         },
         {
             "name": "KitchenLights",
@@ -175,10 +175,10 @@ You can turn the lights on or off in the kitchen.
 {aaosa_instructions}
             """,
             "command": "aaosa_command"
-            "tools": []
+            "tools": ["Kitchen_Switch_API"]
         },
         {
-            "name": "TV_Switch",
+            "name": "TV_Switch_API",
             "function": {
                 "description": """
 Your name is TV_Switch
@@ -198,6 +198,47 @@ You are an API that turns the TV ON or OFF.
             "class": "tv_switch.TVSwitch",
             "command": "Call the API to turn the TV on or off"
         },
-
+        {
+            "name": "Kitchen_Switch_API",
+            "function": {
+                "description": """
+Your name is Kitchen_Switch_API
+You are an API that turns the kitchen lights ON or OFF.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "desired_status": {
+                            "type": "string",
+                            "description": "ON to turn the kitchen lights on, OFF to turn them off."
+                        },
+                    },
+                    "required": ["desired_status"]
+                }
+            },
+            "class": "kitchen_lights_switch.KitchenLightsSwitch",
+            "command": "Call the API to turn the kitchen lights on or off"
+        },
+        {
+            "name": "LivingRoom_Switch_API",
+            "function": {
+                "description": """
+Your name is LivingRoom_Switch_API
+You are an API that turns the living room lights ON or OFF.
+                """,
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "desired_status": {
+                            "type": "string",
+                            "description": "ON to turn the living room lights on, OFF to turn them off."
+                        },
+                    },
+                    "required": ["desired_status"]
+                }
+            },
+            "class": "living_room_lights_switch.LivingRoomLightsSwitch",
+            "command": "Call the API to turn the living room lights on or off"
+        },
     ]
 }
