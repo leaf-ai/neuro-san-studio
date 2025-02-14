@@ -159,14 +159,14 @@ tool_registries found: ['agent_network_A', 'agent_network_C']
 
 ##### Agent specifications
 
-| **Field**            | **Description**                                                                                                                              |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| agent_name           | text handle for other agent specs and hosting system to refer to                                                                             |
-| function             | Open AI function spec (standard) that formally describes the various inputs that the agent expects                                           |
-| generic_instructions | text that sets up the agent in detail for its task                                                                                           |
-| message              | text that sets the agent in motion after it receives all its inputs                                                                          |
-| tools                | optional list of references to other agents that this agent is allowed to call in the course of working through their input and instructions |
-| llm_config           | optional agent-specification for different LLMs for different purposes such as specialization, costs, etc.                                   |
+| **Field**    | **Description**                                                                                                                              |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| agent_name   | text handle for other agent specs and hosting system to refer to                                                                             |
+| function     | Open AI function spec (standard) that formally describes the various inputs that the agent expects                                           |
+| instructions | text that sets up the agent in detail for its task                                                                                           |
+| command      | text that sets the agent in motion after it receives all its inputs                                                                          |
+| tools        | optional list of references to other agents that this agent is allowed to call in the course of working through their input and instructions |
+| llm_config   | optional agent-specification for different LLMs for different purposes such as specialization, costs, etc.                                   |
 
 ##### Tool specifications
 
