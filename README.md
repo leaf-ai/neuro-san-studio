@@ -209,6 +209,21 @@ DB connectors
 
 #### AAOSA
 
+AAOSA stands for Adaptive Agent Oriented Software Architecture.
+
+In this architecture, agents decide if they can answer inquiries or if they need to call other agents to help them.
+
+Reference:
+[Iterative Statistical Language Model Generation for Use with an
+Agent-Oriented Natural Language Interface ](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=3004005f1e736815b367be83f2f90cc0fa9e0411)
+
+<!-- (https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=011fb718658d611294613286c0f4b143aed40f43) -->
+
+Look at [./registries/smart_home.one.hocon](./registries/smart_home_onf.hocon) and in particular:
+- aaosa_instructions
+- aaosa_call
+- aaosa_command
+
 #### Connect with other agent frameworks
 
 e.g. crewAI, AutoGen, LangGraph, etc.
