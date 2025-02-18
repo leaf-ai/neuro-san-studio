@@ -1,0 +1,220 @@
+{
+  "llm_config": {
+    "model_name": "gpt-4o",
+    "verbose": true
+  },
+  "commondefs": {
+    "replacement_strings": {
+      "instructions_prefix": """
+      You are responsible for a segment of a smart home system.
+      Only answer inquiries or execute commands that are directly within your domain.
+      Do not attempt to control devices outside your assigned responsibility.
+      Follow the provided guidelines and use the coded tools to perform control actions.
+      """,
+      "aaosa_instructions": """
+When you receive a command or inquiry:
+    0. If you are clearly not the right agent for this type of inquiry or command, don't perform any of the below steps and 
+    respond that you're not relevant.
+    1. Otherwise, identify which down-chain agents or tools are responsible for that specific control or query.
+    2. Gather any additional parameters required for execution.
+    3. Delegate the task to the appropriate down-chain agent(s) using the coded tools.
+    4. If the inquiry is ambiguous, for example if more than one agent can fulfill the inquiry, then always ask for clarification.
+    5. Once all responses are received, compile and return the final action or status.
+      """
+    },
+    "replacement_values": {
+      "aaosa_call": {
+        "description": "Depending on the mode, returns a natural language response or executes a control command.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "inquiry_command": {
+              "type": "string",
+              "description": "The control inquiry or command to execute (e.g., 'turn on', 'turn off', 'query status')."
+            },
+            "mode": {
+              "type": "string",
+              "description": """
+Indicates whether the agent is being asked to check status, execute a control command, 
+or gather requirements to execute the command.
+              """
+            }
+          },
+          "required": [
+            "inquiry_command",
+            "mode"
+          ]
+        }
+      },
+      "aaosa_command": """
+      Explain if you can execute the command and what additional parameters you might require.
+      return a json block with the following fields:
+        {
+            "name": <your name>,
+            "inquiry_command": <the inquiry or command>,
+            "mode": <Determine | Fulfill>,
+            "relevant": <Yes | No>,
+            "action": <None | 'on' | 'off' | 'status' | 'info'>,
+            "response": <Your response to the inquiry or command>
+        }
+      """
+    }
+  },
+  "tools": [
+    {
+      "name": "SmartHome 360 Assistant",
+      "function": {
+        "description": """
+        You are SmartHome 360 Assistant, the central agent managing the smart home system.
+        You handle inquiries and commands for the entire smart home and delegate device‑specific tasks 
+        to specialized agents.
+        """
+      },
+      "instructions": """
+{instructions_prefix}
+Your name is `SmartHome 360 Assistant`.
+You are the top-level agent for the Smart Home system. Handle all device-related inquiries 
+and commands by delegating them to the appropriate down-chain agents. Answer inquiries related to the smart home.
+{aaosa_instructions}
+If none of the agents or tools can help with the inquiry about a smart home device or appliance, 
+just say `this device or appliance is not connected to the SmartHome 360 System at the moment`.
+When interacting with the user, do not expose the internal device tools directly.
+      """,
+      "tools": ["LivingRoomLamp", "TVUnit", "Radio", "KitchenLights"]
+    },
+    {
+      "name": "LivingRoomLamp",
+      "function": "aaosa_call",
+      "instructions": """
+{instructions_prefix}
+The name of this agent is LivingRoomLamp.
+You are responsible for controlling the living room lamp. Your tasks include turning the lamp on or off 
+and reporting its status.
+{aaosa_instructions}
+Delegate the execution to your coded tool when needed.
+      """,
+      "command": "aaosa_command",
+      "tools": ["SmartHomeAPILampTool"]
+    },
+    {
+      "name": "TVUnit",
+      "function": "aaosa_call",
+      "instructions": """
+{instructions_prefix}
+The name of this agent is TVUnit.
+You are responsible for controlling the TV unit, including turning it on or off and querying its status.
+{aaosa_instructions}
+Delegate the actual control to your coded tool.
+      """,
+      "command": "aaosa_command",
+      "tools": ["SmartHomeAPITVTool"]
+    },
+    {
+      "name": "Radio",
+      "function": "aaosa_call",
+      "instructions": """
+{instructions_prefix}
+The name of this agent is Radio.
+You are responsible for controlling the radio, including turning it on or off and querying its status.
+{aaosa_instructions}
+Delegate the command execution to your coded tool.
+      """,
+      "command": "aaosa_command",
+      "tools": ["SmartHomeAPIRadioTool"]
+    },
+    {
+      "name": "KitchenLights",
+      "function": "aaosa_call",
+      "instructions": """
+{instructions_prefix}
+The name of this agent is KitchenLights.
+You are responsible for controlling the kitchen wall lights as a group. 
+Your responsibilities include turning all the lights on or off and reporting their collective status.
+{aaosa_instructions}
+Delegate the action to your coded tool.
+      """,
+      "command": "aaosa_command",
+      "tools": ["SmartHomeAPIKitchenLightTool"]
+    },
+    {
+      "name": "SmartHomeAPILampTool",
+      "function": {
+        "description": """
+        Calls the FastAPI endpoint to control the Living Room Lamp.
+        """,
+        "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "action": {
+                            "type": "string",
+                            "description": "The desired action to perform for the device: on, off, info or status."
+                        },
+                    },
+                    "required": ["action"]
+        }
+      },
+      "class": "shapi_lrlamp.SmartHomeAPILampTool",
+      "command": "Call the FastAPI endpoint to control the Living Room Lamp."
+    },
+    {
+      "name": "SmartHomeAPITVTool",
+      "function": {
+        "description": """
+        Calls the FastAPI endpoint to control the TV Unit.
+        """,
+        "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "action": {
+                            "type": "string",
+                            "description": "The desired action to perform for the device: on, off, info or status."
+                        },
+                    },
+                    "required": ["action"]
+        }
+      },
+      "class": "shapi_tv.SmartHomeAPITVTool",
+      "command": "Call the FastAPI endpoint to control the TV Unit."
+    },
+    {
+      "name": "SmartHomeAPIRadioTool",
+      "function": {
+        "description": """
+        Calls the FastAPI endpoint to control the Radio.
+        """,
+        "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "action": {
+                            "type": "string",
+                            "description": "The desired action to perform for the device: on, off, info or status."
+                        },
+                    },
+                    "required": ["action"]
+        }
+      },
+      "class": "shapi_radio.SmartHomeAPIRadioTool",
+      "command": "Call the FastAPI endpoint to control the Radio."
+    },
+    {
+      "name": "SmartHomeAPIKitchenLightTool",
+      "function": {
+        "description": """
+        Calls the FastAPI endpoint to control the Kitchen Lights.
+        """,
+        "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "action": {
+                            "type": "string",
+                            "description": "The desired action to perform for the device: on, off, info or status."
+                        },
+                    },
+                    "required": ["action"]
+        }
+      },
+      "class": "shapi_kitchenlights.SmartHomeAPIKitchenLightTool",
+      "command": "Call the FastAPI endpoint to control the Kitchen Lights."
+    }
+  ]
+}
