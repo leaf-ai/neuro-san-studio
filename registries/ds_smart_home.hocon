@@ -7,30 +7,37 @@
     "replacement_strings": {
       "instructions_prefix": """
       You are responsible for a segment of a smart home system.
-      Only answer inquiries or execute commands that are directly within your domain.
+      Only answer inquiries or control devices that are directly within your domain.
       Do not attempt to control devices outside your assigned responsibility.
-      Follow the provided guidelines and use the coded tools to perform control actions.
+      Use the down-chain tools to perform all and any device control actions.
+      Do not try to help for personal matters.
       """,
       "aaosa_instructions": """
 When you receive a command or inquiry:
     0. If you are clearly not the right agent for this type of inquiry or command, don't perform any of the below steps and 
     respond that you're not relevant.
-    1. Otherwise, identify which down-chain agents or tools are responsible for that specific control or query.
-    2. Gather any additional parameters required for execution.
-    3. Delegate the task to the appropriate down-chain agent(s) using the coded tools.
-    4. If the inquiry is ambiguous, for example if more than one agent can fulfill the inquiry, then always ask for clarification.
-    5. Once all responses are received, compile and return the final action or status.
+    1. Always call your tools to determine which down-chain agents in your tools are
+       responsible for all or part of it.
+    2. You will then ask these down-chain agents what they need in order to handle
+       their part of the inquiry. Once the requirements are gathered, you will,
+    3. Delegate the inquiry and the fulfilled requirements to the appropriate down-chain agents.
+    4. Once all actions are performed and responses are received, 
+       you will compile their responses and return the final action or status.
       """
     },
     "replacement_values": {
       "aaosa_call": {
-        "description": "Depending on the mode, returns a natural language response or executes a control command.",
+        "description": "Depending on the mode, returns a natural language response or call a tool to control a device.",
         "parameters": {
           "type": "object",
           "properties": {
-            "inquiry_command": {
+            "inquiry": {
               "type": "string",
               "description": "The control inquiry or command to execute (e.g., 'turn on', 'turn off', 'query status')."
+            },
+            "action": {
+              "type": "string",
+              "description": "The control action 'on', 'off', 'status', 'info' or None."
             },
             "mode": {
               "type": "string",
@@ -41,19 +48,20 @@ or gather requirements to execute the command.
             }
           },
           "required": [
-            "inquiry_command",
+            "inquiry",
+            "action",
             "mode"
           ]
         }
       },
       "aaosa_command": """
-      Explain if you can execute the command and what additional parameters you might require.
-      return a json block with the following fields:
+      Execute the command and return a json block with the following fields:
         {
             "name": <your name>,
-            "inquiry_command": <the inquiry or command>,
+            "inquiry": <the inquiry>,
             "mode": <Determine | Fulfill>,
             "relevant": <Yes | No>,
+            "tools: <[list of your downchain tools]>,
             "action": <None | 'on' | 'off' | 'status' | 'info'>,
             "response": <Your response to the inquiry or command>
         }
@@ -78,7 +86,6 @@ and commands by delegating them to the appropriate down-chain agents. Answer inq
 {aaosa_instructions}
 If none of the agents or tools can help with the inquiry about a smart home device or appliance, 
 just say `this device or appliance is not connected to the SmartHome 360 System at the moment`.
-When interacting with the user, do not expose the internal device tools directly.
       """,
       "tools": ["LivingRoomLamp", "TVUnit", "Radio", "KitchenLights"]
     },
@@ -88,10 +95,8 @@ When interacting with the user, do not expose the internal device tools directly
       "instructions": """
 {instructions_prefix}
 The name of this agent is LivingRoomLamp.
-You are responsible for controlling the living room lamp. Your tasks include turning the lamp on or off 
-and reporting its status.
+Always call your down-chain tools for controlling the living room lamp, including turning it on or off and querying its status.
 {aaosa_instructions}
-Delegate the execution to your coded tool when needed.
       """,
       "command": "aaosa_command",
       "tools": ["SmartHomeAPILampTool"]
@@ -102,9 +107,8 @@ Delegate the execution to your coded tool when needed.
       "instructions": """
 {instructions_prefix}
 The name of this agent is TVUnit.
-You are responsible for controlling the TV unit, including turning it on or off and querying its status.
+Always call your down-chain tools for controlling the TV unit, including turning it on or off and querying its status.
 {aaosa_instructions}
-Delegate the actual control to your coded tool.
       """,
       "command": "aaosa_command",
       "tools": ["SmartHomeAPITVTool"]
@@ -115,9 +119,8 @@ Delegate the actual control to your coded tool.
       "instructions": """
 {instructions_prefix}
 The name of this agent is Radio.
-You are responsible for controlling the radio, including turning it on or off and querying its status.
+Always call your down-chain tools for controlling the radio, including turning it on or off and querying its status.
 {aaosa_instructions}
-Delegate the command execution to your coded tool.
       """,
       "command": "aaosa_command",
       "tools": ["SmartHomeAPIRadioTool"]
@@ -128,10 +131,9 @@ Delegate the command execution to your coded tool.
       "instructions": """
 {instructions_prefix}
 The name of this agent is KitchenLights.
-You are responsible for controlling the kitchen wall lights as a group. 
-Your responsibilities include turning all the lights on or off and reporting their collective status.
+Always call your down-chain tools for controlling the kitchen wall lights as a group, 
+including turning it on or off and querying its status. 
 {aaosa_instructions}
-Delegate the action to your coded tool.
       """,
       "command": "aaosa_command",
       "tools": ["SmartHomeAPIKitchenLightTool"]

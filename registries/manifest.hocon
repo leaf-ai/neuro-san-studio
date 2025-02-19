@@ -15,4 +15,5 @@
     "hello_world.hocon": true,
     "smart_home.hocon": true,
     "smart_home_onf.hocon": true,
+    "ds_smart_home.hocon": true,
 }

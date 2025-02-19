@@ -6,11 +6,11 @@ class SmartHomeAPILampTool(CodedTool):
     """
     CodedTool implementation that calls an API to control the Living Room Lamp.
     """
-    def __init__(self, base_http_url: str = "http://127.0.0.1:8001/api/v1/"):
+    def __init__(self):
         """
         Constructor for the api.
         """
-        self.base_http_url = base_http_url
+        self.base_http_url = "http://127.0.0.1:8001/api/v1/"
 
     def get_status_http(self) -> Union[str, Dict[str, Any]]:
         endpoint = self.base_http_url + "lamp/status"
@@ -44,14 +44,14 @@ class SmartHomeAPILampTool(CodedTool):
     def handle_status(self, action: str) -> Union[str, Dict[str, Any]]:
         return self.get_status_http()
 
-    def invoke(self, args: Dict[str, Any]) -> Union[str, Dict[str, Any]]:
+    def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> Union[str, Dict[str, Any]]:
         """
         :param args: An argument dictionary whose keys are the parameters
                 to the coded tool and whose values are the values passed for them
                 by the calling agent.  This dictionary is to be treated as read-only.
 
                 The argument dictionary expects the following keys:
-                    "action": what the user wants to do with the device: On or Off or check Status or Info.
+                    "action": what to do with the device: On or Off or check Status or Info.
 
         :param sly_data: A dictionary whose keys are defined by the agent hierarchy,
                 but whose values are meant to be kept out of the chat stream.
@@ -74,6 +74,8 @@ class SmartHomeAPILampTool(CodedTool):
                 "Error: <error message>"
         """
         action = args.get("action", "status").lower()
+        print(f"**********Calling {self.__class__.__name__} API**********")
+        print(f"With action: {action}")
         if not action:
             return "Error: No action provided."
         action_map = {
@@ -84,4 +86,6 @@ class SmartHomeAPILampTool(CodedTool):
         }
         if action not in action_map:
             return "Error: Unknown action. Use 'on', 'off', 'status', or 'info'."
-        return {"response": action_map[action](action)}
+        res = action_map[action](action)
+        print(f"********** {self.__class__.__name__} API Action completed **********")
+        return {"response": res}
