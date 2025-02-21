@@ -38,6 +38,8 @@ Welcome to the **Neuro AI Multi-Agent Accelerator** tutorial. In this guide, we 
 
 The library comes with a **Flask Web Client** (`neuro_san_web_client`) so that users can interact with these multi-agent networks through a web-based UI. This entire setup is easily configurable using **HOCON** (`.hocon`) files.
 
+**Note**: This tutorial is written with the help of the example [hello_world_tools](https://github.com/leaf-ai/neuro-san-demos/blob/registries/hello_world_tools.hocon).
+
 ---
 
 ## 2. Project Structure
@@ -140,6 +142,7 @@ These agents can coordinate tasks among themselves. A top-level (or front-man) a
 
 ### Function Calling with Agents
 In Neuro AI Multi-Agent Accelerator, Agents may declare a function with defined parameters. Other agents can call this function by providing the required parameters. This allows complex tasks to be broken into sub-tasks, each handled by specialized agents or tools.
+
 **Note**: Refer to this [OpenAI blog](https://community.openai.com/t/function-calling-parameter-types/268564/7) and [OpenAI Cookbook](https://cookbook.openai.com/examples/function_calling_with_an_openapi_spec) for more information.
 
 ### Data-Driven Agent Network
@@ -291,7 +294,92 @@ Let’s take a look at a more robust multi-agent network file: `hello_world_tool
 }
 ```
 
-Note: The snippet above is intentionally simplified. The actual hello_world_tools`.hocon` is more verbose and includes more detail (you can see the full example provided in this tutorial’s introduction).
+A few points to note about multi-agent networks: 
+- The snippet above is intentionally simplified. The actual hello_world_tools`.hocon` is more verbose and includes more detail (you can see the full example provided in this tutorial’s introduction).
+- The relationship between different agents can be defined in the hocon file itself. The down-chain agents can be defined in the `"tools"` section of each agent definition in a parent-child style. For example the `Math Geek` agent has access to the `problem_formulator` agent and the `problem_formulator` agent has access to the calculator agent via '`"tools": ["CalculatorTool"]`
+- It is possible to have the same down-chain agent available for several other agents at the same time.
+- Defining an agent network is highly flexible. We can define all sort of networks: Single Agent Network, Hierarchical Agent Network, DAG oriented Network, Single Agent with Coded Tools, Multiple Agents with Multiple Coded Tools.
+
+
+### LLM Configs
+LLM configurations is a way to tell the agents whcih LLM (Large Language Model) to use in order to process a query sent to it.
+
+- LLM config is defined on top of the hocon file which implies that the same config is accessible to all the agents in the network by default.
+- It is possible to keep the default config and have separate config for each agent in the network. This means an agent that does not have a defined config always uses the default llm_config defined on top of the hocon file.
+- It is possible to have different LLMs for each of our agents for example, we can use `gpt-4o` for the front-man agent `Math Geek` and `llama3.1` for the `problem_formulator`. Here is the hocon example to show that:
+```hocon
+{
+    "llm_config": {
+        "model_name": "gpt4-o",
+        "verbose": true
+    },
+    "commondefs": {
+        "replacement_strings": {
+            "instructions_prefix": """
+                You are responsible for a segment of a problem...
+            """,
+            "aaosa_instructions": """
+                When you receive an inquiry:
+                0. If you are clearly not the right agent...
+                1. Always call your tools...
+                ...
+            """
+        },
+        "replacement_values": {}
+    },
+    "tools": [
+        {
+            "name": "Math Geek",
+            "function": {
+                "description": "I can help you to do quick calculations."
+            },
+            "instructions": """
+                {instructions_prefix}
+                Your name is `Math Geek`.
+                You are the top-level agent for the mathematics system.
+                {aaosa_instructions}
+            """,
+            "tools": ["problem_formulator"]
+        },
+        {
+            "name": "problem_formulator",
+            "llm_config": {
+                "model_name": "llama3.1",
+                "verbose": true
+            },
+            "function": {
+                "description": "Convert a math problem into a sequence of known operations.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "inquiry": { "type": "string" }
+                    },
+                    "required": ["inquiry"]
+                }
+            },
+            "instructions": """
+                Your name is `Problem Formulator`.
+                You will be handed a math problem and parse it into a known sequence of operations...
+            """,
+            "command": """
+                - Identify operations and operands
+                - Call the CalculatorTool
+            """
+        },
+    ]
+}
+```
+
+- The llm_config uses `model_name` as a parameter. We can use these models with openai, azure, ollama, anthropic and nvidia as a provider.
+- Here is a list of supported LLMs that can be used as `model_name` as of 20-Feb-2025:
+    - OpenAI: ['gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4-1106-preview', 'gpt-4-vision-preview', 'gpt-4', 'gpt-4-32k']
+    - AzureChatOpenAI: ['azure-gpt-3.5-turbo', 'azure-gpt-4']
+    - Anthropic: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus', 'claude-2.1', 'claude-2.0', 'claude-instant-1.2']
+    - Ollama: ['llama2', 'llama3', 'llama3.1', 'llama3:70b', 'llava', 'mistral', 'mistral-nemo', 'mixtral', 'qwen2.5:14b', 'deepseek-r1:14b']
+    - ChatNvidia: ['nvidia-llama-3.1-405b-instruct', 'nvidia-llama-3.3-70b-instruct', 'nvidia-deepseek-r1']
+- Note that not all of these LLMs support function-calling, it is advisable to read the documentation before using any of the LLMs.
+- Each of these LLMs have several config params. Some of the common config parameters are: `model_name`, `temperature`, `verbose`, `max_tokens`.
+
 
 #### Running this multi-agent network:
 
@@ -302,6 +390,8 @@ python -m run
 ```
 
 Now, the top-level **Math Geek** agent will parse user queries, pass them to **problem_formulator**, which in turn calls the **CalculatorTool**. The final answer is then relayed back to the user.
+
+--- 
 
 ## 7. How to Switch LLMs Using the HOCON File
 Because **Neuro AI Multi-Agent Accelerator** uses `neuro-san`, it is LLM-agnostic, you can switch to different model providers by changing the `llm_config` in your `.hocon` file.
