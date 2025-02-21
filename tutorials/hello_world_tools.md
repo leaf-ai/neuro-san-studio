@@ -48,7 +48,6 @@ Below is a simplified view of the reference project structure. You can adapt it 
 .
 ├── README.md
 ├── coded_tools
-│   ├── ds_smart_home
 │   └── hello_world_tools
 │       └── calculator_tool.py
 ├── logs
