@@ -17,6 +17,7 @@ Welcome to the **Neuro AI Multi-Agent Accelerator** tutorial. In this guide, we 
 6. [Creating an Agent Network from Scratch](#creating-an-agent-network-from-scratch)  
    - [Single Agent Network Example](#single-agent-network-example)  
    - [Multi-Agent Network Example](#multi-agent-network-example)  
+   - [LLM Config](#llm-config)
 7. [How to Switch LLMs Using the HOCON File](#how-to-switch-llms-using-the-hocon-file)  
    - [Setting Up Ollama Locally](#setting-up-ollama-locally)  
    - [Adding Endpoint URL for Any Cloud-Hosted LLM](#adding-endpoint-url-for-any-cloud-hosted-llm)  
@@ -301,7 +302,8 @@ A few points to note about multi-agent networks:
 - Defining an agent network is highly flexible. We can define all sort of networks: Single Agent Network, Hierarchical Agent Network, DAG oriented Network, Single Agent with Coded Tools, Multiple Agents with Multiple Coded Tools.
 
 
-### LLM Configs
+### LLM Config
+
 LLM configurations is a way to tell the agents whcih LLM (Large Language Model) to use in order to process a query sent to it.
 
 - LLM config is defined on top of the hocon file which implies that the same config is accessible to all the agents in the network by default.
@@ -381,7 +383,7 @@ LLM configurations is a way to tell the agents whcih LLM (Large Language Model) 
 - Each of these LLMs have several config params. Some of the common config parameters are: `model_name`, `temperature`, `verbose`, `max_tokens`.
 
 
-#### Running this multi-agent network:
+#### Running the multi-agent network:
 
 ```bash
 export AGENT_MANIFEST_FILE="./registries/hello_world_tools.hocon"
