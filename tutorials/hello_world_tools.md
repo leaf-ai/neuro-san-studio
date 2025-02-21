@@ -49,31 +49,14 @@ Below is a simplified view of the reference project structure. You can adapt it 
 ├── README.md
 ├── coded_tools
 │   ├── ds_smart_home
-│   ├── hello_world_tools
-│   │   └── calculator_tool.py
-│   └── smart_home_onf
-│       ├── kitchen_lights_switch.py
-│       ├── lights_switch.py
-│       ├── living_room_lights_switch.py
-│       └── tv_switch.py
-├── lib
-│   ├── bindings
-│   │   └── utils.js
-│   ├── tom-select
-│   │   ├── tom-select.complete.min.js
-│   │   └── tom-select.css
-│   └── vis-9.1.2
-│       ├── vis-network.css
-│       └── vis-network.min.js
+│   └── hello_world_tools
+│       └── calculator_tool.py
 ├── logs
 │   ├── client.log
 │   └── server.log
 ├── registries
-│   ├── hello_world.hocon
 │   ├── hello_world_tools.hocon
-│   ├── manifest.hocon
-│   ├── smart_home.hocon
-│   └── smart_home_onf.hocon
+│   └── manifest.hocon
 ├── requirements.txt
 ├── run.py
 └── wheels_private
