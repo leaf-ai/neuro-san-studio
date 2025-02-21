@@ -39,7 +39,7 @@ Welcome to the **Neuro AI Multi-Agent Accelerator** tutorial. In this guide, we 
 
 The library comes with a **Flask Web Client** (`neuro_san_web_client`) so that users can interact with these multi-agent networks through a web-based UI. This entire setup is easily configurable using **HOCON** (`.hocon`) files.
 
-**Note**: This tutorial is written with the help of the example [hello_world_tools](https://github.com/leaf-ai/neuro-san-demos/blob/registries/hello_world_tools.hocon).
+**Note**: This tutorial is written with the help of the agent network example [hello_world_tools.hocon](https://github.com/leaf-ai/neuro-san-demos/blob/registries/hello_world_tools.hocon).
 
 ---
 
