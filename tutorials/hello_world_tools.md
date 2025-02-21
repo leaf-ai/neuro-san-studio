@@ -73,7 +73,7 @@ Below is a simplified view of the reference project structure. You can adapt it 
 - `wheels_private/`: Contains wheel files for installing the required packages.
 - `run.py`: A starter script to run the server and the web client.
 
-### Please find the detailed instructions to run an agent network along with a web client here:
+Please find the detailed instructions to run an agent network along with a web client here:
 - https://github.com/leaf-ai/neuro-san-demos/blob/main/README.md
 
 ---
@@ -120,7 +120,11 @@ pip install wheels_private/leaf_common-1.2.18-py3-none-any.whl
 pip install wheels_private/leaf_server_common-0.1.15-py3-none-any.whl
 ```
 
+Please find the detailed instructions to run an agent network along with a web client here:
+- https://github.com/leaf-ai/neuro-san-demos/blob/main/README.md
+
 Note: You may need to adapt the filenames if versions differ.
+
 
 ---
 
