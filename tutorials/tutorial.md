@@ -390,7 +390,7 @@ LLM configurations is a way to tell the agents whcih LLM (Large Language Model) 
 #### Running the multi-agent network:
 
 ```bash
-export AGENT_MANIFEST_FILE="./registries/advanced_calculator.hocon"
+export AGENT_MANIFEST_FILE="./registries/manifest.hocon"
 export AGENT_TOOL_PATH="./coded_tools"
 python -m run
 ```
