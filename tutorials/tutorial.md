@@ -77,8 +77,8 @@ Below is a simplified view of the reference project structure. You can adapt it 
     - Note that the wheel file versions might have changed since the time of writing this tutorial.
 - `run.py`: A starter script to run the server and the web client.
 
-Please find the detailed instructions to run an agent network along with a web client here:
-- https://github.com/leaf-ai/neuro-san-demos/blob/main/README.md
+- Here are the detailed instructions to run an agent network along with a web client here:
+    - https://github.com/leaf-ai/neuro-san-demos/blob/main/README.md
 
 ---
 
@@ -86,13 +86,13 @@ Please find the detailed instructions to run an agent network along with a web c
 To get your environment up and running, you will need to install several wheel files:
 
 1. `neuro_san`:
-- This is the core library for multi-agent orchestration.
+    - This is the core library for multi-agent orchestration.
 2. `neuro_san_web_client-0.1.3-py3-none-any.whl`:
-- This package provides a Flask web application UI that interacts with the `neuro-san` backend.
-- Internally, it uses the pyvis library (specifically `vis-9.1.2`) for rendering network graphs on the web page.
+    - This package provides a Flask web application UI that interacts with the `neuro-san` backend.
+    - Internally, it uses the pyvis library (specifically `vis-9.1.2`) for rendering network graphs on the web page.
 3. `leaf_common` and `leaf_server_common`:
-- These packages manage server-side setups for `neuro-san`. Users typically do not need to worry about them for normal usage.
-You can find these wheel files in the `wheels_private/` directory.
+    - These packages manage server-side setups for `neuro-san`. Users typically do not need to worry about them for normal usage.
+    - You can find these wheel files in the `wheels_private/` directory.
 
 ---
 
