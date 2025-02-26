@@ -39,7 +39,7 @@ Welcome to the **Neuro AI Multi-Agent Accelerator** tutorial. In this guide, we 
 
 The library comes with a **Flask Web Client** (`neuro_san_web_client`) so that users can interact with these multi-agent networks through a web-based UI. This entire setup is easily configurable using **HOCON** (`.hocon`) files.
 
-**Note**: This tutorial is written with the help of the agent network example [hello_world_tools.hocon](https://github.com/leaf-ai/neuro-san-demos/blob/registries/hello_world_tools.hocon).
+**Note**: This tutorial is written with the help of the agent network example [advanced_calculator.hocon](https://github.com/leaf-ai/neuro-san-demos/blob/registries/advanced_calculator.hocon).
 
 ---
 
@@ -51,20 +51,20 @@ Below is a simplified view of the reference project structure. You can adapt it 
 .
 ├── README.md
 ├── coded_tools
-│   └── hello_world_tools
+│   └── advanced_calculator
 │       └── calculator_tool.py
 ├── logs
 │   ├── client.log
 │   └── server.log
 ├── registries
-│   ├── hello_world_tools.hocon
+│   ├── advanced_calculator.hocon
 │   └── manifest.hocon
 ├── requirements.txt
 ├── run.py
 └── wheels_private
     ├── leaf_common-1.2.18-py3-none-any.whl
     ├── leaf_server_common-0.1.15-py3-none-any.whl
-    ├── neuro_san-0.4.5-py3-none-any.whl
+    ├── neuro_san-0.4.6-py3-none-any.whl
     └── neuro_san_web_client-0.1.3-py3-none-any.whl
 ```
 
@@ -73,7 +73,8 @@ Below is a simplified view of the reference project structure. You can adapt it 
 - `coded_tools/`: Contains custom-coded tool classes (e.g., `calculator_tool.py`).
 - `registries/`: Holds `.hocon` files that define multi-agent networks and their configurations.
 - `logs/`: Where client and server logs are written.
-- `wheels_private/`: Contains wheel files for installing the required packages.
+- `wheels_private/`: Contains wheel files for installing the required packages. 
+    - Note that the wheel file versions might have changed since the time of writing this tutorial.
 - `run.py`: A starter script to run the server and the web client.
 
 Please find the detailed instructions to run an agent network along with a web client here:
@@ -206,7 +207,7 @@ Let’s start simple. We’ll build a minimal `.hocon` file containing only one 
 
 ```bash
 # Make sure your venv is active
-export AGENT_MANIFEST_FILE="./registries/single_agent_example.hocon"
+export AGENT_MANIFEST_FILE="./registries/manifest.hocon"
 export AGENT_TOOL_PATH="./coded_tools"
 python -m run
 ```
@@ -214,7 +215,7 @@ python -m run
 Since this agent has no further sub-agents or coded tools, it will simply respond to queries but won’t be able to do actual calculations. It is functionally incomplete, but demonstrates a minimal single-agent network.
 
 ### Multi-Agent Network Example
-Let’s take a look at a more robust multi-agent network file: `hello_world_tools.hocon`. Below is a simplified variant with two agents: Math Geek and problem_formulator, plus a coded tool named `CalculatorTool`.
+Let’s take a look at a more robust multi-agent network file: `advanced_calculator.hocon`. Below is a simplified variant with two agents: Math Geek and problem_formulator, plus a coded tool named `CalculatorTool`.
 
 ```hocon
 {
@@ -296,8 +297,8 @@ Let’s take a look at a more robust multi-agent network file: `hello_world_tool
 ```
 
 A few points to note about multi-agent networks: 
-- The snippet above is intentionally simplified. The actual hello_world_tools`.hocon` is more verbose and includes more detail (you can see the full example provided in this tutorial’s introduction).
-- The relationship between different agents can be defined in the hocon file itself. The down-chain agents can be defined in the `"tools"` section of each agent definition in a parent-child style. For example the `Math Geek` agent has access to the `problem_formulator` agent and the `problem_formulator` agent has access to the calculator agent via '`"tools": ["CalculatorTool"]`
+- The snippet above is intentionally simplified. The actual `advanced_calculator.hocon` is more verbose and includes more detail (you can see the full example provided in this tutorial’s introduction).
+- The relationship between different agents can be defined in the hocon file itself. The down-chain agents can be defined in the `tools` section of each agent definition in a parent-child style. For example the `Math Geek` agent has access to the `problem_formulator` agent and the `problem_formulator` agent has access to the calculator agent via '`"tools": ["CalculatorTool"]`
 - It is possible to have the same down-chain agent available for several other agents at the same time.
 - Defining an agent network is highly flexible. We can define all sort of networks: Single Agent Network, Hierarchical Agent Network, DAG oriented Network, Single Agent with Coded Tools, Multiple Agents with Multiple Coded Tools.
 
@@ -372,8 +373,9 @@ LLM configurations is a way to tell the agents whcih LLM (Large Language Model) 
 }
 ```
 
+#### Notes on `llm_config`:
 - The llm_config uses `model_name` as a parameter. We can use these models with openai, azure, ollama, anthropic and nvidia as a provider.
-- Here is a list of supported LLMs that can be used as `model_name` as of 20-Feb-2025:
+- Here is a list of supported LLMs that can be used as `model_name` as of 26-Feb-2025:
     - OpenAI: ['gpt-3.5-turbo', 'gpt-3.5-turbo-16k', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4-1106-preview', 'gpt-4-vision-preview', 'gpt-4', 'gpt-4-32k']
     - AzureChatOpenAI: ['azure-gpt-3.5-turbo', 'azure-gpt-4']
     - Anthropic: ['claude-3-haiku', 'claude-3-sonnet', 'claude-3-opus', 'claude-2.1', 'claude-2.0', 'claude-instant-1.2']
@@ -381,12 +383,14 @@ LLM configurations is a way to tell the agents whcih LLM (Large Language Model) 
     - ChatNvidia: ['nvidia-llama-3.1-405b-instruct', 'nvidia-llama-3.3-70b-instruct', 'nvidia-deepseek-r1']
 - Note that not all of these LLMs support function-calling, it is advisable to read the documentation before using any of the LLMs.
 - Each of these LLMs have several config params. Some of the common config parameters are: `model_name`, `temperature`, `verbose`, `max_tokens`.
+- For the available configuration parameters of the above chat models, please refer to [Langchain Chat Models](https://python.langchain.com/docs/concepts/chat_models/) and their [respective documentation](https://python.langchain.com/docs/integrations/chat/)
+
 
 
 #### Running the multi-agent network:
 
 ```bash
-export AGENT_MANIFEST_FILE="./registries/hello_world_tools.hocon"
+export AGENT_MANIFEST_FILE="./registries/advanced_calculator.hocon"
 export AGENT_TOOL_PATH="./coded_tools"
 python -m run
 ```
@@ -446,17 +450,17 @@ If you use other providers (e.g., Anthropic, OpenAI, Azure, etc.), simply adjust
 Coded Tools are Python classes that implement the neuro_san.interfaces.coded_tool.CodedTool interface. Agents invoke these tools to perform specialized tasks (like calculations, database lookups, API calls, etc.) without relying on the LLM to do everything.
 
 ### Adding a Coded Tool
-By convention, you create a subdirectory under coded_tools/ matching the HOCON filename. For example, for hello_world_tools.hocon, you can place custom tools in:
+By convention, you create a subdirectory under coded_tools/ matching the HOCON filename. For example, for advanced_calculator.hocon, you can place custom tools in:
 
 ```bash
-coded_tools/hello_world_tools/
+coded_tools/advanced_calculator/
 ```
 Then, reference them in the HOCON file via the `"class"` field, e.g.:
 
 ```hocon
 "class": "calculator_tool.CalculatorCodedTool"
 ```
-Here, `calculator_tool.py` is placed in the `./coded_tools/hello_world_tools/` directory.
+Here, `calculator_tool.py` is placed in the `./coded_tools/advanced_calculator/` directory.
 
 ### Simple Calculator Tool
 Below is a simplified version of `calculator_tool.py`, supporting only `add`, `subtract`, `multiply`, and `divide`. (We omit error checks for brevity.)
