@@ -163,7 +163,7 @@ You can now type your message in the chat box and press 'Send' to interact with 
 ---
 
 ## Tutorial
-For a detailed tutorial, refer to a detailed [tutorial.md](http://github.com/leaf-ai/neuro-san-demos/blob/demo-tutorials-ds/tutorials/tutorial.md)
+For a detailed tutorial, refer to a detailed [tutorial.md](tutorials/tutorial.md)
 
 ---
 
