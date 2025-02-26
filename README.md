@@ -2,6 +2,39 @@
 This repository contains a collection of demos for the neuro-san library.
 They should help developers to get started with the library and to understand how to create their own agents.
 
+- [Demos for the neuro-san library](#demos-for-the-neuro-san-library)
+  - [Installation](#installation)
+  - [Run](#run)
+  - [(Optional) How to run in demo-mode](#optional-how-to-run-in-demo-mode)
+  - [(Optional) Details for manual run](#optional-details-for-manual-run)
+    - [Start the client](#start-the-client)
+      - [Option 1: Command line interface](#option-1-command-line-interface)
+    - [Query the client](#query-the-client)
+      - [Option 2: Web client](#option-2-web-client)
+  - [Tutorial](#tutorial)
+  - [Quick-Start](#quick-start)
+    - [Hello World](#hello-world)
+    - [Hello World - custom LLMs](#hello-world---custom-llms)
+    - [Hocon files](#hocon-files)
+      - [Manifest](#manifest)
+      - [Agent network](#agent-network)
+        - [Agent specifications](#agent-specifications)
+        - [Tool specifications](#tool-specifications)
+        - [LLM specifications](#llm-specifications)
+    - [Multi-agent networks](#multi-agent-networks)
+    - [Coded tools](#coded-tools)
+      - [Simple tool](#simple-tool)
+      - [API calling tool](#api-calling-tool)
+      - [Sly data](#sly-data)
+    - [Toolbox](#toolbox)
+    - [Logging and debugging](#logging-and-debugging)
+    - [Advanced](#advanced)
+      - [Sub networks](#sub-networks)
+      - [AAOSA](#aaosa)
+      - [Connect with other agent frameworks](#connect-with-other-agent-frameworks)
+
+---
+
 ## Installation
 
 Clone the repo:
@@ -37,9 +70,41 @@ export OPENAI_API_KEY="XXX" && echo 'export OPENAI_API_KEY="XXX"' >> ~/.zshrc
 ```
 Other models are supported too but will require proper setup.
 
+---
+
 ## Run
 
-### Start the server
+Start the server and the client in one single command:
+```bash
+python -m run
+```
+
+The client and server logs will show on the screen,
+and will also be saved to `logs/server.log` and `logs/client.log` respectively.
+As a default, on a web browser you can now navigate to http://127.0.0.1:<port>/ to start using the application.
+
+To see the various config options for this app, on terminal
+```bash
+python -m run -h
+```
+or
+```bash
+python -m run --help
+```
+
+---
+
+## (Optional) How to run in demo-mode
+
+This is really meant to experience some of the default multi-agent networks that are available in the neuro-san library.
+To use it, start the server and the client in one single command:
+```bash
+python -m run --demo-mode
+```
+
+---
+
+## (Optional) Details for manual run
 
 Export the following environment variables:
 ```bash
@@ -95,7 +160,14 @@ Then navigate to http://127.0.0.1:5001 in your browser.
 
 You can now type your message in the chat box and press 'Send' to interact with the agent network.
 
+---
+
 ## Tutorial
+For a detailed tutorial, refer to a detailed [tutorial.md](tutorials/tutorial.md)
+
+---
+
+## Quick-Start
 
 ### Hello World
 
@@ -233,4 +305,3 @@ Look at [./registries/smart_home.one.hocon](./registries/smart_home_onf.hocon) a
 
 e.g. crewAI, AutoGen, LangGraph, etc.
 AgentForce, ServiceNow, 
-
