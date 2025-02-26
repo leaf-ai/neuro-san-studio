@@ -406,9 +406,11 @@ Because **Neuro AI Multi-Agent Accelerator** uses `neuro-san`, it is LLM-agnosti
 "llm_config": {
     "model_name": "llama3.1",
     "verbose": true
-    # Additional fields like endpoint_url for local or remote inference servers
+    # Additional fields like endpoint_url for remote inference servers
 }
 ```
+
+**Note**: The `base_url` config parameter is not needed when running `ollama` on a local machine or a laptop.
 
 ### Setting Up Ollama Locally
 Ollama is a local LLM runner for Mac (and also works on Windows via Docker or other means).
