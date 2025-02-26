@@ -424,10 +424,7 @@ On macOS, that might look like:
 ollama serve --port 11434
 ```
 On Windows, you might use Docker:
-
-```bash
-docker run -p 11434:11434 ghcr.io/jmorganca/ollama:latest
-```
+Refere to the [docker hub ollama documentation](https://hub.docker.com/r/ollama/ollama) on how to set up a docker instance.
 
 ### Adding Endpoint URL for Any Cloud-Hosted LLM
 To direct the calls to your local Ollama, or a cloud-hosted model endpoint, add:
