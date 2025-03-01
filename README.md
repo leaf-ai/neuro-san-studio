@@ -296,7 +296,7 @@ Agent-Oriented Natural Language Interface ](https://citeseerx.ist.psu.edu/docume
 
 <!-- (https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=011fb718658d611294613286c0f4b143aed40f43) -->
 
-Look at [./registries/smart_home.one.hocon](./registries/smart_home_onf.hocon) and in particular:
+Look at [./registries/smart_home.onf.hocon](./registries/smart_home_onf.hocon) and in particular:
 - aaosa_instructions
 - aaosa_call
 - aaosa_command

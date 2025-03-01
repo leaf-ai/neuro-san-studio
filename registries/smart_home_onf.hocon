@@ -16,7 +16,7 @@ When you receive an inquiry, you will:
 1. If you are clearly not the right agent for this type of inquiry, reply you're not relevant.
 2. If there is a chance you're relevant, call your down-chain agents to determine if they can answer all or part of the inquiry.
    Do not assume what your down-chain agents can do. Always call them. You'll be surprised.
-3. Deterime which down-chain agents have the strongest claims to the inquiry.
+3. Determine which down-chain agents have the strongest claims to the inquiry.
    3.1 If the inquiry is ambiguous, for example if more than one agent can fulfill the inquiry, then always ask for clarification.
    3.2 Otherwise, call the relevant down-chain agents and:
        - ask them for follow-up information if needed,
@@ -57,7 +57,7 @@ If mode is 'Determine', return a json block with the following fields:
     "Name": <your name>,
     "Inquiry": <the inquiry>,
     "Mode": <Determine | Fulfill>,
-    "Relevant": <Yes | No>
+    "Relevant": <Yes | No>,
     "Strength": <number between 1 and 10 representing how certain you are in your claim>,
     "Claim:" <All | Partial>,
     "Requirements" <None | list of requirements>
