@@ -57,7 +57,7 @@ If mode is 'Determine', return a json block with the following fields:
     "Name": <your name>,
     "Inquiry": <the inquiry>,
     "Mode": <Determine | Fulfill>,
-    "Relevant": <Yes | No>
+    "Relevant": <Yes | No>,
     "Strength": <number between 1 and 10 representing how certain you are in your claim>,
     "Claim:" <All | Partial>,
     "Requirements" <None | list of requirements>
