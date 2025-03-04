@@ -160,7 +160,7 @@ You can also start a web client instead to interact with the agent network:
 python -m neuro_san_web_client.app
 ```
 
-Then navigate to http://127.0.0.1:5001 in your browser.
+Then navigate to http://127.0.0.1:5001 in your browser. Expand the 'Configuration' section at the bottom of the page, and make sure the 'Agent Network Name' matches the agent network name you specified in the manifest file, minus the .hocon extension. E.g., use 'hello_world' if you have 'hello_world.hocon' in your manifest file.
 
 You can now type your message in the chat box and press 'Send' to interact with the agent network.
 
