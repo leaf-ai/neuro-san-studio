@@ -46,6 +46,10 @@ Go to dir:
 ```bash
 cd neuro-san-demos
 ```
+Ensure you have a supported version of python (3.12 at this time)
+```bash
+python --version
+```
 
 Create a dedicated Python virtual environment:
 ```bash
@@ -81,7 +85,7 @@ python -m run
 
 The client and server logs will show on the screen,
 and will also be saved to `logs/server.log` and `logs/client.log` respectively.
-As a default, on a web browser you can now navigate to http://127.0.0.1:<port>/ to start using the application.
+As a default, on a web browser you can now navigate to http://127.0.0.1:5003/ to start using the application.
 
 To see the various config options for this app, on terminal
 ```bash
