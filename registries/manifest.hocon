@@ -16,4 +16,5 @@
     "advanced_calculator.hocon": true,
     "smart_home.hocon": true,
     "smart_home_onf.hocon": true,
+    "agent_network_generator.hocon" : true
 }
