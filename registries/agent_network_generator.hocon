@@ -34,20 +34,22 @@
             },
             "instructions": """
 {instructions_prefix}
-You are responsible for designing and modifying agent networks based on user requirements. For example,
+You are responsible for designing and modifying agent networks based on user requirements.
+Take the following steps. Make sure you don't miss any details and follow the steps carefully.
 1) take in the name of a company or organization, or the description of a domain, and generate an agent network definition for an organization mirroring
-workflows and responsible nodes relevant to that company.
+workflows and responsible nodes relevant to that company. Use your network_generator tool for this.
 
 2) Once the agent network definition is generated, call the instruction_refiner tool for every agent in the agent network and append the agent's
 existing instructions with those returned from the instruction_refiner tool.
 
-3) Use the header_appender tool to include a header section at the beginning of each generated agent network definition.
+3) Next, use the header_appender tool to include a header section at the beginning of each generated agent network definition.
 
 4) Any agent network definition created should be verified using your network_validator tool, before returning to the user.
 
-5) Iterate on modifying and fixing any issues highlighted by the verifier.
+5) Iterate on modifying and fixing any issues highlighted by the verifier by instructing your network_generator tool to make the fixes.
 
 6) Return the exact full agent network definition hocon once done and fully verified.
+Pay extra attention to the symbols and make sure the proper replacements: replace every * with a quote symbol, replace every # with an open bracket symbol, and every % with a close bracket symbol.
             """,
             "tools": ["network_generator", "query_generator", "instruction_refiner", "network_validator", "header_appender"]
         },
@@ -126,10 +128,8 @@ You Execute hands-on technical work at customer premises and coordinates with th
 #instructions_prefix%
 You monitor network health, respond to alerts, and initiate troubleshooting remotely for a telco with a B2B business.
 You Provide round-the-clock monitoring and first-line response to network performance issues.
-#aaosa_instructions%
             ***,
             *command*: *#aaosa_command%*
-            *tools*: [*noc_manager*]
         %,
         #
             *name*: *project_manager*,
@@ -141,17 +141,7 @@ You coordinates larger, cross-location projects and manage timelines, resources,
 #aaosa_instructions%
             ***,
             *command*: *#aaosa_command%*
-            *tools*: [*senior_network_architect*, *logistics_coordinator*]
-        %,
-        #
-            *name*: *senior_network_architect*,
-            *function*: *aaosa_call*,
-            *instructions*: ***
-#instructions_prefix%
-You design the overall architecture for large-scale network infrastructure across multiple locations.
-You provide the strategic vision and high-level design for network services and oversee implementation for large-scale projects.
-            ***,
-            *command*: *#aaosa_command%*
+            *tools*: [*logistics_coordinator*]
         %,
         #
             *name*: *account_manager*,
@@ -160,18 +150,6 @@ You provide the strategic vision and high-level design for network services and 
 #instructions_prefix%
 You manages the business relationship with the customer, addressing their needs, and ensuring ongoing satisfaction.
 You act as the main point of contact for clients post-sale, ensuring that the services meet their business needs.
-#aaosa_instructions%
-            ***,
-            *command*: *#aaosa_command%*
-            *tools*: [*sales_engineer*]
-        %,
-        #
-            *name*: *noc_manager*,
-            *function*: *aaosa_call*,
-            *instructions*: ***
-#instructions_prefix%
-You oversee the NOC team to ensure network performance and availability are maintained across all locations.
-You ensure the NOC team is efficiently handling alerts, escalations, and incidents, and communicates any critical issues to senior management.
             ***,
             *command*: *#aaosa_command%*
         %,
@@ -192,12 +170,13 @@ Make sure your design has no cycles. Make sure you have leaf nodes with no link 
 
 Also note, there should only be one 'front-man' which is the top agent, with a function that has a description. All other agents should have:
 
-*function*: *aaosa_call*,
+*function*: *#aaosa_call%*,
 
 instead.
 
 Finally, note that any agent that is not a leaf node (i.e., does not have any tools), will have to have the following at the end of its instructions:
 #aaosa_instructions%
+Make agents granular so that you have at least a depth of three agents from the top for some chains.
 Output the generated network in a clean and structured format.
             """,
             "command": "Call to generate an agent network definition."
@@ -305,7 +284,78 @@ Output the generated network in a clean and structured format.
         {
             "name": "network_validator",
             "function": {
-                "description": "I can validate an agent network definition."
+                "description": "I can check anf fix an agent network definition."
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "agent_network_definition": {
+                            "type": "string",
+                            "description": "agent network definition."
+                        },
+                    },
+                    "required": ["agent_network_definition"]
+                }
+            },
+            "instructions": """
+{instructions_prefix}
+You check and validate an agent network definition using your tools.
+First, call you instructions_validator tool.
+If there are any invalid instructions reported, correct them in the instructions and call the tool again until all instructions are valid.
+Then, call the full_network_validator tool to make sure the entire agent network definition is valid.
+Fix any issues and call the full_network_validator again, until the definition is reported as valid.
+Return the fully validated agent network definition.
+            """,
+            "command": "Call to validate agent network definition.",
+            "tools": ["instructions_validator", "full_network_validator"]
+        },
+        {
+            "name": "instructions_validator",
+            "function": {
+                "description": "I can check an agent network definition's instructions."
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "agent_network_definition": {
+                            "type": "string",
+                            "description": "agent network definition."
+                        },
+                    },
+                    "required": ["agent_network_definition"]
+                }
+            },
+            "instructions": """
+{instructions_prefix}
+You check the instructions of agents in an agent network definition.
+In the below example syntax, replace every * with a quote symbol, replace every # with an open bracket symbol, and every % with a close bracket symbol.
+An agent in an agent network definition will have look like the example below, which defines a field technician agent:
+        #
+            *name*: *field_technician*,
+            *function*: *aaosa_call*,
+            *instructions*: ***
+#instructions_prefix%
+You are responsible for onsite installation, maintenance, and troubleshooting of network equipment at customer locations for a telco with a B2B business.
+You Execute hands-on technical work at customer premises and coordinates with the engineer to ensure networks are functional.,
+#aaosa_instructions%
+            ***,
+            *command*: *#aaosa_command%*
+            *tools*: [*logistics_coordinator*]
+        %,
+
+Review the given agent network definition and check that:
+1) instructions are multi-line, between ***'s
+2) the instructions all start with #instructions_prefix%
+3) if the agent is not a leaf node (i.e., it has tools), then the instructions end with #aaosa_instructions%
+4) the instructions are reasonably complete
+
+If any of the above are not true, then respond with the agent name and problem in the instructions that you have spotted.
+Only validate the instructions if all agents have correct instructions per the above.
+            """,
+            "command": "Call to validate the instructions of an agent network definition."
+        },
+        {
+            "name": "full_network_validator",
+            "function": {
+                "description": "I can validate an agent network's full definition."
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -448,10 +498,8 @@ You Execute hands-on technical work at customer premises and coordinates with th
 #instructions_prefix%
 You monitor network health, respond to alerts, and initiate troubleshooting remotely for a telco with a B2B business.
 You Provide round-the-clock monitoring and first-line response to network performance issues.
-#aaosa_instructions%
             ***,
             *command*: *#aaosa_command%*
-            *tools*: [*noc_manager*]
         %,
         #
             *name*: *project_manager*,
@@ -463,17 +511,7 @@ You coordinates larger, cross-location projects and manage timelines, resources,
 #aaosa_instructions%
             ***,
             *command*: *#aaosa_command%*
-            *tools*: [*senior_network_architect*, *logistics_coordinator*]
-        %,
-        #
-            *name*: *senior_network_architect*,
-            *function*: *aaosa_call*,
-            *instructions*: ***
-#instructions_prefix%
-You design the overall architecture for large-scale network infrastructure across multiple locations.
-You provide the strategic vision and high-level design for network services and oversee implementation for large-scale projects.
-            ***,
-            *command*: *#aaosa_command%*
+            *tools*: [*logistics_coordinator*]
         %,
         #
             *name*: *account_manager*,
@@ -482,18 +520,6 @@ You provide the strategic vision and high-level design for network services and 
 #instructions_prefix%
 You manages the business relationship with the customer, addressing their needs, and ensuring ongoing satisfaction.
 You act as the main point of contact for clients post-sale, ensuring that the services meet their business needs.
-#aaosa_instructions%
-            ***,
-            *command*: *#aaosa_command%*
-            *tools*: [*sales_engineer*]
-        %,
-        #
-            *name*: *noc_manager*,
-            *function*: *aaosa_call*,
-            *instructions*: ***
-#instructions_prefix%
-You oversee the NOC team to ensure network performance and availability are maintained across all locations.
-You ensure the NOC team is efficiently handling alerts, escalations, and incidents, and communicates any critical issues to senior management.
             ***,
             *command*: *#aaosa_command%*
         %,
@@ -514,7 +540,7 @@ Make sure your design has no cycles. Make sure you have leaf nodes with no link 
 
 Also note, there should only be one 'front-man' which is the top agent, with a function that has a description. All other agents should have:
 
-*function*: *aaosa_call*,
+*function*: *#aaosa_call%*,
 
 instead.
 
@@ -524,7 +550,7 @@ Finally, note that any agent that is not a leaf node (i.e., does not have any to
 Make sure that the symbol replacements have been made correctly and every * is replaced with a quote symbol, every # with an open bracket symbol, and every % with a close bracket symbol.
 
             """,
-            "command": "Call to validate an agent network definition."
+            "command": "Call to validate an agent network's full definition."
         },
         {
             "name": "query_generator",
