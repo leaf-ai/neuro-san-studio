@@ -14,7 +14,7 @@
         "model_name": "gpt-4o",
         "verbose": true
     },
-    "max_iterations": 10000,
+    "max_iterations": 20000,
     "max_execution_seconds": 600,
     "commondefs": {
         "replacement_strings": {
