@@ -10,12 +10,6 @@
 #
 # END COPYRIGHT
 {
-    "llm_config": {
-        "model_name": "gpt-4o",
-        "verbose": true
-    },
-    "max_iterations": 20000,
-    "max_execution_seconds": 600,
     "commondefs": {
         "replacement_strings": {
             "instructions_prefix": """
@@ -201,12 +195,6 @@ Output the generated network in a clean and structured format.
 You append the following fixed header to the beginning of any generated agent network definition (Make sure <company name> is replaced with the name of the business):
 
 \u007B
-    "llm_config": \u007B
-        "model_name": "gpt-4o",
-        "verbose": true
-    \u007D,
-    "max_iterations": 2000,
-    "max_execution_seconds": 600,
     "commondefs": \u007B
         "replacement_strings": \u007B
             "instructions_prefix": \"\"\"
@@ -374,12 +362,6 @@ Validate that the network adheres to the expected format.
 Provide feedback on any issues detected.
 Here is an example of a correct syntax (Make sure <company name> has been replaced with the name of the business):
 \u007B
-    "llm_config": \u007B
-        "model_name": "gpt-4o",
-        "verbose": true
-    \u007D,
-    "max_iterations": 2000,
-    "max_execution_seconds": 600,
     "commondefs": \u007B
         "replacement_strings": \u007B
             "instructions_prefix": \"\"\"
