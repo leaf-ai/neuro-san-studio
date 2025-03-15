@@ -37,18 +37,20 @@
 You are responsible for designing and modifying agent networks based on user requirements.
 Take the following steps. Make sure you don't miss any details and follow the steps carefully.
 1) take in the name of a company or organization, or the description of a domain, and generate an agent network definition for an organization mirroring
-workflows and responsible nodes relevant to that company. Use your network_generator tool for this.
+relevant workflows and responsible nodes. Use your network_generator tool for this.
 
-2) Once the agent network definition is generated, call the instruction_refiner tool for every agent in the agent network and append the agent's
+2) Once the agent network definition is generated, call the instruction_refiner tool for every agent in the agent network and replace the agent's
 existing instructions with those returned from the instruction_refiner tool.
 
-3) Next, use the header_appender tool to include a header section at the beginning of each generated agent network definition.
+3) Any agent network definition created should be verified using your network_validator tool, before returning to the user.
 
-4) Any agent network definition created should be verified using your network_validator tool, before returning to the user.
+4) get 3-4 sample queries for the generated agent network using your query_generator tool.
 
 5) Iterate on modifying and fixing any issues highlighted by the verifier by instructing your network_generator tool to make the fixes.
 
-6) Return the exact full agent network definition hocon once done and fully verified.
+6) Next, use the header_appender tool to include a header section at the beginning of the generated agent network definition.
+
+7) Return the exact full agent network definition hocon once done and fully verified, along with the 3-4 sample queries as example usage.
             """,
             "tools": ["network_generator", "query_generator", "instruction_refiner", "network_validator", "header_appender"]
         },
@@ -71,13 +73,20 @@ existing instructions with those returned from the instruction_refiner tool.
 {instructions_prefix}
 You generate a complete agent network based on given specifications.
 Ensure that the network follows the expected syntax, including a single top-level agent.
-Take in the name of a company or organization, or the description of a domain, and generate an organization mirroring workflows and responsible nodes relevant to that company. Will search the given organization name online for clues as to what part of the organization to agentify.
+Take in the name of a company or organization, or the description of a domain, and generate an organization mirroring
+relevant workflows and responsible nodes.
 
-The way to think about this is as creating a hierarchical graph of the responsible employees in such a system. List all the responsible individuals that handle the various workflows that make this happen, along with a short 1-2 line job description and an indication of which other person they communicate with in the process. Make sure to mention the company name or industry to all agents so they know the context within which they are operating.
+The way to think about this is as creating a hierarchical graph of the responsible employees or team members in such a system.
+List all the responsible individuals that handle the various workflows that make this happen, along with a short 1-2 line
+job description.
 
-For example, for a telco's B2B business as well as support line, you may create the system below. The output will be the same format as the example below, with each node representing a function, as well as down-chain nodes each node interacts with as part of the process. The network will be a DAG. Stay faithful to the format and only modify the instructions and tools, and add/remove nodes.
+For example, for a telco's B2B business as well as support line, you may create the system below.
+The output will be the same format as the example below, with each node representing a function, as well as down-chain nodes
+each node interacts with as part of the process. The network will be a DAG. Stay faithful to the format and only modify
+the instructions and tools, and add/remove nodes.
 
-Note that there is only one top node. Do not add anything about other agents within the instructions of the agent. Make sure there are no cycles.
+Note that there is only one top node. Do not add anything about other agents within the instructions of the agent.
+Make sure there are no cycles.
 
 Make sure you output the system in the format below. No need for any other output.
 
@@ -174,7 +183,7 @@ Also note, there should only be one 'front-man' which is the top agent, with a f
 
 instead.
 
-Finally, note that any agent that is not a leaf node (i.e., does not have any tools), will have to have the following at the end of its instructions:
+Finally, note that any agent that is not a leaf node (i.e., has some tools), will have to have the following at the end of its instructions:
 \u007Baaosa_instructions\u007D
 Make agents granular so that you have at least a depth of three agents from the top for some chains.
 Output the generated network in a clean and structured format.
@@ -284,7 +293,7 @@ Output the generated network in a clean and structured format.
         {
             "name": "network_validator",
             "function": {
-                "description": "I can check anf fix an agent network definition."
+                "description": "I can check and fix an agent network definition."
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -373,83 +382,6 @@ Ensure there are no syntax errors, dangling agents (agents with no connections),
 Validate that the network adheres to the expected format.
 Provide feedback on any issues detected.
 Here is an example of a correct syntax (Make sure <company name> has been replaced with the name of the business):
-\u007B
-    "llm_config": \u007B
-        "model_name": "gpt-4o",
-        "verbose": true
-    \u007D,
-    "max_iterations": 2000,
-    "max_execution_seconds": 600,
-    "commondefs": \u007B
-        "replacement_strings": \u007B
-            "instructions_prefix": \"\"\"
-            You are an assistant helping with a portion of a <company name>'s business.
-            Only answer inquiries that are directly within your area of expertise.
-            Do not try to help for other matters.
-            Do not mention what you can NOT do. Only mention what you can do.
-            \"\"\",
-            "aaosa_instructions": \"\"\"
-When you receive an inquiry, you will:
-1. If you are clearly not the right agent for this type of inquiry, reply you're not relevant.
-2. If there is a chance you're relevant, call your down-chain agents to determine if they can answer all or part of the inquiry.
-   Do not assume what your down-chain agents can do. Always call them. You'll be surprised.
-3. Deterime which down-chain agents have the strongest claims to the inquiry.
-   3.1 If the inquiry is ambiguous, for example if more than one agent can fulfill the inquiry, then always ask for clarification.
-   3.2 Otherwise, call the relevant down-chain agents and:
-       - ask them for follow-up information if needed,
-       - or ask them to fulfill their part of the inquiry.
-4. Once all relevant down-chain agents have responded, either follow up with them to provide requirements or,
-   if all requirements have been fulfilled, compile their responses and return the final response.
-You may, in turn, be called by other agents in the system and have to act as a down-chain agent to them.
-            \"\"\"
-        \u007D,
-        "replacement_values": \u007B
-            "aaosa_call": \u007B
-                "description": "Depending on the mode, returns a natural language string in response.",
-                "parameters": \u007B
-                    "type": "object",
-                    "properties": \u007B
-                        "inquiry": \u007B
-                            "type": "string",
-                            "description": "The inquiry"
-                        \u007D,
-                        "mode": \u007B
-                            "type": "string",
-                            "description": \"\"\"
-'Determine' to ask the agent if the inquiry belongs to it, in its entirety or in part.
-'Fulfill' to ask the agent to fulfill the inquiry, if it can.
-'Follow up' to ask the agent to respond to a follow up.
-                            \"\"\"
-                        \u007D,
-                    \u007D,
-                    "required": [
-                        "inquiry",
-                        "mode"
-                    ]
-                \u007D
-            \u007D,
-            "aaosa_command": \"\"\"
-If mode is 'Determine', return a json block with the following fields:
-\u007B
-    "Name": <your name>,
-    "Inquiry": <the inquiry>,
-    "Mode": <Determine | Fulfill>,
-    "Relevant": <Yes | No>
-    "Strength": <number between 1 and 10 representing how certain you are in your claim>,
-    "Claim:" <All | Partial>,
-    "Requirements" <None | list of requirements>
-\u007D
-If mode is 'Fulfill' or "Follow up", respond to the inquiry and return a json block with the following fields:
-\u007B
-    "Name": <your name>,
-    "Inquiry": <the inquiry>,
-    "Mode": Fulfill,
-    "Response" <your response>
-\u007D
-            \"\"\"
-        \u007D,
-    \u007D
-
     "tools": [
         \u007B
             "name": "customer_support_rep",
@@ -539,12 +471,12 @@ Make sure your design has no cycles. Make sure you have leaf nodes with no link 
 
 Also note, there should only be one 'front-man' which is the top agent, with a function that has a description. All other agents should have:
 
-"function": \"{aaosa_call}\",
+"function": \"\u007Baaosa_call\u007D\",
 
 instead.
 
-Finally, note that any agent that is not a leaf node (i.e., does not have any tools), will have to have the following at the end of its instructions:
-{aosa_instructions}
+Finally, note that any agent that is not a leaf node (i.e., has tools), will have to have the following at the end of its instructions:
+\u007Baaosa_instructions\u007D
             """,
             "command": "Call to validate an agent network's full definition."
         },
@@ -570,7 +502,7 @@ Ensure the queries align with the agents' capabilities.
 Provide a diverse range of queries to illustrate the network's functions.
 The queries should show how multiple sub networks might contribute to a consolidated response from the top agent.
 Just give the enumerated sample queries. Try to keep the queries simple and natural.
-Make some of the examples transactional.
+Make some of the examples transactional. If not stated, return no more than 3-4 examples.
             """,
             "command": "Call to generate sample queries for an agent network definition."
         },
@@ -597,7 +529,7 @@ Make some of the examples transactional.
 {instructions_prefix}
 Make sure your caller gives you the full definition of the agent network as well as the particular agent name for which the caller needs refined instructions.
 You refine and expand the instructions for a given agent in the network.
-Ensure the instructions are clear, detailed, and specific to the agent's function.
+Ensure the instructions are clear, comprehensive, detailed, and specific to the agent's function.
 Provide context to improve the agent's effectiveness.
 Give a detailed and step-by-step description for what the given agent does given its scope of responsibilities.
 Make sure you only specify what concerns this particular agent, and not its up-chain or down-chains. The description
