@@ -1,6 +1,7 @@
 from typing import Any
 from typing import Dict
 from typing import Union
+import json
 
 from neuro_san.interfaces.coded_tool import CodedTool
 
@@ -49,6 +50,7 @@ class AgentforceAPI(CodedTool):
                 "Error: <error message>"
         """
         inquiry: str = args.get("inquiry")
+        final_response: Dict[str, Any] = {}
         print(f"========== Calling self.__class__.__name__ ==========")
         print(f"Start date: {inquiry}")
         if self.agentforce.is_configured:
@@ -57,12 +59,15 @@ class AgentforceAPI(CodedTool):
         else:
             print("WARNING: AgentforceAdapter is not configured. Using mock response")
             res = "mock response"
-        res["app_name"] = "Agentforce Adapter"
-        res["app_url"] = self.agentforce.APP_URL
+        res = json.dumps(res)
+        message_list = json.loads(res).get("messages", "No message received")
+        final_response["message"] = message_list[0].get("message", "No message received")
+        final_response["app_name"] = self.__class__.__name__
+        final_response["app_url"] = self.agentforce.APP_URL
         print("-----------------------")
-        print("Agentforce response:", res)
+        print("Agentforce response:", final_response)
         print("========== Done with self.__class__.__name__ ==========")
-        return res
+        return final_response
 
 
 # Example usage:
