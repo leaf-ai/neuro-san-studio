@@ -1,5 +1,7 @@
+import json
 import os
 import requests
+import uuid
 
 
 class AgentforceAdapter:
@@ -7,12 +9,11 @@ class AgentforceAdapter:
     Absence Manager for Cognizant's OneCognizant intranet.
     """
     ACCESS_TOKEN_URL = "https://mciardullo-cogfy26-225-demo.my.salesforce.com/services/oauth2/token"
-    BASE_URL = "https://apigatewaysit.cognizant.com/1CPlatform"
-    APP_URL = "https://compass.talent.cognizant.com/psc/HCMPRD/EMPLOYEE/HRMS/c/CT_FLUID_MNU.CT_ESS_MABS_FLU.GBL"
+    SESSION_URL = "https://api.salesforce.com/einstein/ai-agent/v1/agents/0XxKc000000kvtXKAQ/sessions"
 
     def __init__(self, client_id, client_secret):
         """
-        Constructs an Absence Manager for Cognizant's OneCognizant intranet.
+        Constructs a Salesforce Agentforce Adapter.
         @param client_id: The API client ID.
         @param client_secret: The API client secret.
         @param associate_id: an associate ID.
@@ -48,13 +49,15 @@ class AgentforceAdapter:
 
             # Get an access token
             self.access_token = self.get_access_token()
-            print(f"Access token: {self.access_token}")
+            # print(f"Access token: {self.access_token}")
             # Set the headers
             self.headers = {
                 'Authorization': f'Bearer {self.access_token}',
                 'Content-Type': 'application/json',
                 'SourceType': 'Web'
             }
+            uuid_str = str(uuid.uuid4())
+            self.session_id = self.get_session(uuid_str)
 
     def get_access_token(self):
         """
@@ -73,40 +76,75 @@ class AgentforceAdapter:
         access_token = response.json()['access_token']
         return access_token
 
-    def get_absence_types(self, start_date):
+    def get_session(self, uuid_str):
         """
-        Get absence types.
-        URL: /hcm/leave/details
-        :param start_date: The start date for the absence types (format: 'YYYY-MM-DD').
-        :return: JSON response from the API.
+        Get a session
+        @return: a session
         """
-        url = f"{self.BASE_URL}/hcm/leave/details"
-        payload = {
-            "Start_date": start_date
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Content-Type': 'application/json',
         }
-        response = requests.post(url, headers=self.headers, json=payload)
-        return response.json()
+        # print("----Session headers:")
+        # print(headers)
+        data = {
+            "externalSessionKey": uuid_str,
+            "instanceConfig": {
+                "endpoint": "https://mciardullo-cogfy26-225-demo.my.salesforce.com"
+            },
+            "streamingCapabilities": {
+                "chunkTypes": ["Text"]
+            },
+            "bypassUser": "true"
+        }
+        # print("----Session data:")
+        # print(data)
+        # Convert data to json
+        data_json = json.dumps(data)
+        response = requests.post(AgentforceAdapter.SESSION_URL, headers=headers, data=data_json)
+        # print("---- Session:")
+        # print(response.json())
+        session_id = response.json()['sessionId']
+        print("---- Session_id: ", session_id)
+        return session_id
 
-    def get_absence_details(self, start_date, end_date, abs_pin, partial_days, absence_reason): # /hcm/leave/selection
-        """
-        Get absence details.
+    def close_session(self):
+        close_session_base_url = "https://api.salesforce.com/einstein/ai-agent/v1/sessions"
+        close_session_url = f"{close_session_base_url}/{self.session_id}"
+        print(f"---- Close session URL: {close_session_url}")
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "x-session-end-reason": "UserRequest",
+        }
+        response = requests.delete(close_session_url, headers=headers)
+        print(response)
+        print("---- Session closed:")
 
-        :param start_date: Start date (format: 'YYYY-MM-DD').
-        :param end_date: End date (format: 'YYYY-MM-DD').
-        :param abs_pin: Absence PIN.
-        :param partial_days: Partial days.
-        :param absence_reason: Absence reason.
-        :return: JSON response from the API.
-        """
-        url = f"{self.BASE_URL}/hcm/leave/selection"
-        payload = {
-        "Start_date": start_date,
-        "End_date": end_date,
-        "Abs_pin": abs_pin,
-        "Partial_days": partial_days,
-        "Absence_Reason": absence_reason
-    }
-        response = requests.post(url, headers=self.headers, json=payload)
+    def post_message(self, message):
+        message_url = f"https://api.salesforce.com/einstein/ai-agent/v1/sessions/{self.session_id}/messages"
+        print(f"---- Message URL: {message_url}")
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        timestamp = 42
+        data = {
+            "message": {
+                "sequenceId": timestamp,
+                "type": "Text",
+                "text": message,
+            },
+            "variables": []
+        }
+        # Convert data to json
+        data_json = json.dumps(data)
+        print(f"---- Data JSON: {data_json}")
+        response = requests.post(message_url, headers=headers, data=data_json)
+        print("---- Response:")
+        print(response)
+        print("---- Response JSON:")
+        print(response.json())
         return response.json()
 
 
@@ -115,3 +153,10 @@ if __name__ == "__main__":
     a_client_id = None  # Replace with your client_id
     a_client_secret = None  # Replace with your client_id
     agentforce = AgentforceAdapter(a_client_id, a_client_secret)
+    # message = "Can you help me find training resources for Salesforce?"
+    a_message = "Can you give me a list of Lauren Bailey's most recent cases?"
+    agentforce.post_message(a_message)
+    a_second_message = "lbailey@example.com"
+    agentforce.post_message(a_second_message)
+    agentforce.close_session()
+    print("Done!")
