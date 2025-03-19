@@ -9,7 +9,7 @@ from coded_tools.agentforce.agentforce_adapter import AgentforceAdapter
 
 class AgentforceAPI(CodedTool):
     """
-    CodedTool implementation which checks the Leave Balances for an employee.
+    CodedTool implementation of Agentforce API.
     """
 
     def __init__(self):
