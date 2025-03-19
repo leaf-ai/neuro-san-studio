@@ -14,9 +14,9 @@ class AgentforceAPI(CodedTool):
 
     def __init__(self):
         """
-        Constructs a Leave Balances Checker for Cognizant's OneCognizant intranet.
+        Constructs an Agentforce API for Cognizant's Neuro AI Multi-Agent Accelerator.
         """
-        # Construct an AbsenceManager object using environment variables
+        # Construct an AgentforceAdapter object using environment variables
         self.agentforce = AgentforceAdapter(None, None)
 
     def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> Union[Dict[str, Any], str]:
@@ -26,7 +26,7 @@ class AgentforceAPI(CodedTool):
                 by the calling agent. This dictionary is to be treated as read-only.
 
                 The argument dictionary expects the following keys:
-                    "start_date" the date on which to check the balances (format: 'YYYY-MM-DD')
+                    "inquiry" the date on which to check the balances (format: 'YYYY-MM-DD')
 
         :param sly_data: A dictionary whose keys are defined by the agent hierarchy,
                 but whose values are meant to be kept out of the chat stream.
@@ -43,33 +43,32 @@ class AgentforceAPI(CodedTool):
 
         :return:
             In case of successful execution:
-                An Absence Entitlement Balances dictionary with string keys that represent the Entitlement Name
-                and the string values that contain the Current Balances in Days.
+                A respose from the Agentforce API.
             otherwise:
                 a text string an error message in the format:
                 "Error: <error message>"
         """
-        start_date: str = args.get("start_date", "need-start-date")
-        print(">>>>>>>>>>>>>>>>>>> Checking Leave Balances >>>>>>>>>>>>>>>>>>")
-        print(f"Start date: {start_date}")
-        if self.absence_manager.is_configured:
-            print("AbsenceManager is configured. Fetching absence types...")
-            absence_types = self.absence_manager.get_absence_types(start_date)
+        inquiry: str = args.get("inquiry")
+        print(f"========== Calling self.__class__.__name__ ==========")
+        print(f"Start date: {inquiry}")
+        if self.agentforce.is_configured:
+            print("AgentforceAdapter is configured. Fetching response...")
+            res = self.agentforce.get_response(inquiry)
         else:
-            print("WARNING: AbsenceManager is not configured. Using mock response")
-            absence_types = MOCK_RESPONSE
-        absence_types["app_name"] = "Absence Management"
-        absence_types["app_url"] = self.absence_manager.APP_URL
+            print("WARNING: AgentforceAdapter is not configured. Using mock response")
+            res = "mocking bla"
+        res["app_name"] = "Agentforce Adapter"
+        res["app_url"] = self.agentforce.APP_URL
         print("-----------------------")
-        print("Absence Types:", absence_types)
-        print(">>>>>>>>>>>>>>>>>>>DONE !!!>>>>>>>>>>>>>>>>>>")
-        return absence_types
+        print("Agentforce response:", res)
+        print("========== Done with self.__class__.__name__ ==========")
+        return res
 
 
 # Example usage:
 if __name__ == "__main__":
-    check_leave_balances_tool = CheckLeaveBalancesTool()
+    agentforce_tool = AgentforceAPI()
 
-    # Get absence types
-    a_start_date = "2024-11-22"
-    an_absence_types = check_leave_balances_tool.invoke(args={"start_date": a_start_date}, sly_data={})
+    af_inquiry = "find a random product"
+    # Get response
+    af_res = agentforce_tool.invoke(args={"inquiry": af_inquiry}, sly_data={})
