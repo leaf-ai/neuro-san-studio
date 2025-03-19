@@ -53,10 +53,10 @@ class AgentforceAPI(CodedTool):
         print(f"Start date: {inquiry}")
         if self.agentforce.is_configured:
             print("AgentforceAdapter is configured. Fetching response...")
-            res = self.agentforce.get_response(inquiry)
+            res = self.agentforce.post_message(inquiry)
         else:
             print("WARNING: AgentforceAdapter is not configured. Using mock response")
-            res = "mocking bla"
+            res = "mock response"
         res["app_name"] = "Agentforce Adapter"
         res["app_url"] = self.agentforce.APP_URL
         print("-----------------------")
