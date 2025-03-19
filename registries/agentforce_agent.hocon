@@ -63,7 +63,7 @@ Assist caller with the answer or solution to their inquiry by using your tool.
                     "properties": {
                         "inquiry": {
                             "type": "string",
-                            "description": "Search terms to return options."
+                            "description": "Inquiry for which response is sought."
                         },
                     },
                     "required": ["inquiry"]
