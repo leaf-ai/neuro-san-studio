@@ -22,7 +22,7 @@
         # he is the only one with no parameters in his function definition,
         # and therefore he needs to talk to the outside world to get things rolling.
         {
-            "name": "AgentForce Agent",
+            "name": "Agentforce Agent",
 
             # Note that there are no parameters defined for this guy's "function" key.
             # This is the primary way to identify this tool as a front-man,
@@ -45,6 +45,8 @@
          },
 
             "instructions": """
+You are the `Agentforce Agent`.
+Delegate the inquiry and the requirements to your down-chain tools.
 Use your tool to respond to the inquiry.
 """,
             "tools": ["agentforce_adapter"]
