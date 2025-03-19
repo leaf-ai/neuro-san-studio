@@ -51,7 +51,8 @@ class AgentforceAPI(CodedTool):
         """
         inquiry: str = args.get("inquiry")
         final_response: Dict[str, Any] = {}
-        print(f"========== Calling self.__class__.__name__ ==========")
+        tool_name = self.__class__.__name__
+        print(f"========== Calling {tool_name} ==========")
         print(f"Start date: {inquiry}")
         if self.agentforce.is_configured:
             print("AgentforceAdapter is configured. Fetching response...")
@@ -62,11 +63,11 @@ class AgentforceAPI(CodedTool):
         res = json.dumps(res)
         message_list = json.loads(res).get("messages", "No message received")
         final_response["message"] = message_list[0].get("message", "No message received")
-        final_response["app_name"] = self.__class__.__name__
+        final_response["app_name"] = tool_name
         final_response["app_url"] = self.agentforce.APP_URL
         print("-----------------------")
         print("Agentforce response:", final_response)
-        print("========== Done with self.__class__.__name__ ==========")
+        print(f"========== Done with {tool_name} ==========")
         return final_response
 
 
