@@ -69,6 +69,6 @@ class AgentforceAPI(CodedTool):
 if __name__ == "__main__":
     agentforce_tool = AgentforceAPI()
 
-    af_inquiry = "find a random product"
+    af_inquiry = "find training resources for Salesforce"
     # Get response
     af_res = agentforce_tool.invoke(args={"inquiry": af_inquiry}, sly_data={})
