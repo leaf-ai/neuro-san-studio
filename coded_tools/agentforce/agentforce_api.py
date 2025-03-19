@@ -7,6 +7,10 @@ from neuro_san.interfaces.coded_tool import CodedTool
 
 from coded_tools.agentforce.agentforce_adapter import AgentforceAdapter
 
+MOCK_RESPONSE = \
+"""
+{'messages': [{'type': 'Inform', 'id': 'af4b0a83-5f32-4fa0-9f78-22c1a3522ba3', 'feedbackId': 'b8058c93-d3a4-4586-b83c-ceff44bb2a46', 'planId': 'b8058c93-d3a4-4586-b83c-ceff44bb2a46', 'isContentSafe': True, 'message': "Here are Lauren Bailey's most recent cases:\n\n1. Subject: Cognizant Test Case\n   - Status: New\n2. Subject: Question on products\n   - Status: New\n3. Subject: I have a product suggestion.\n   - Status: Closed\n4. Subject: I have a question about my bill\n   - Status: New\n5. Subject: Can you expedite my order?\n   - Status: Closed\n\nIf you need more details or assistance with any of these cases, just let me know!", 'result': [], 'citedReferences': []}], '_links': {'self': None, 'messages': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf/messages'}, 'messagesStream': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf/messages/stream'}, 'session': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/agents/0XxKc000000kvtXKAQ/sessions'}, 'end': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf'}}}"
+"""
 
 class AgentforceAPI(CodedTool):
     """
@@ -44,29 +48,29 @@ class AgentforceAPI(CodedTool):
 
         :return:
             In case of successful execution:
-                A respose from the Agentforce API.
+                A response from the Agentforce API.
             otherwise:
                 a text string an error message in the format:
                 "Error: <error message>"
         """
         inquiry: str = args.get("inquiry")
-        final_response: Dict[str, Any] = {}
+        # final_response: Dict[str, Any] = {}
         tool_name = self.__class__.__name__
         print(f"========== Calling {tool_name} ==========")
-        print(f"Start date: {inquiry}")
+        print(f"Inquiry: {inquiry}")
         if self.agentforce.is_configured:
             print("AgentforceAdapter is configured. Fetching response...")
             res = self.agentforce.post_message(inquiry)
         else:
             print("WARNING: AgentforceAdapter is not configured. Using mock response")
-            res = "mock response"
+            res = "This is amock response"
         res = json.dumps(res)
-        message_list = json.loads(res).get("messages", "No message received")
-        final_response["message"] = message_list[0].get("message", "No message received")
-        final_response["app_name"] = tool_name
-        final_response["app_url"] = self.agentforce.APP_URL
+        message_list = json.loads(res).get("messages", "No messages received")
+        final_response = message_list[0].get("message", "No message received")
+        # final_response["message"] = message_list[0].get("message", "No message received")
+        # final_response["app_name"] = tool_name
         print("-----------------------")
-        print("Agentforce response:", final_response)
+        print("Agentforce response: ", final_response)
         print(f"========== Done with {tool_name} ==========")
         return final_response
 
