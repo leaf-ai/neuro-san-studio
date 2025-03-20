@@ -3,6 +3,10 @@ import os
 import requests
 import uuid
 
+uuid_str = str(uuid.uuid4())
+global_access_token = None
+global_session_id = None
+
 
 class AgentforceAdapter:
     """
@@ -48,16 +52,20 @@ class AgentforceAdapter:
             # Set the headers to get the access token
 
             # Get an access token
-            self.access_token = self.get_access_token()
+            global global_access_token
+            if global_access_token is None:
+                global_access_token = self.get_access_token()
             # print(f"Access token: {self.access_token}")
             # Set the headers
             self.headers = {
-                'Authorization': f'Bearer {self.access_token}',
+                'Authorization': f'Bearer {global_access_token}',
                 'Content-Type': 'application/json',
                 'SourceType': 'Web'
             }
-            uuid_str = str(uuid.uuid4())
-            self.session_id = self.get_session(uuid_str)
+            # uuid_str = str(uuid.uuid4())
+            global global_session_id
+            if global_session_id is None:
+                global_session_id = self.get_session()
 
     def get_access_token(self):
         """
@@ -76,13 +84,13 @@ class AgentforceAdapter:
         access_token = response.json()['access_token']
         return access_token
 
-    def get_session(self, uuid_str):
+    def get_session(self):
         """
         Get a session
         @return: a session
         """
         headers = {
-            'Authorization': f'Bearer {self.access_token}',
+            'Authorization': f'Bearer {global_access_token}',
             'Content-Type': 'application/json',
         }
         # print("----Session headers:")
@@ -110,10 +118,10 @@ class AgentforceAdapter:
 
     def close_session(self):
         close_session_base_url = "https://api.salesforce.com/einstein/ai-agent/v1/sessions"
-        close_session_url = f"{close_session_base_url}/{self.session_id}"
+        close_session_url = f"{close_session_base_url}/{global_session_id}"
         print(f"---- Close session URL: {close_session_url}")
         headers = {
-            "Authorization": f"Bearer {self.access_token}",
+            "Authorization": f"Bearer {global_access_token}",
             "x-session-end-reason": "UserRequest",
         }
         response = requests.delete(close_session_url, headers=headers)
@@ -121,10 +129,10 @@ class AgentforceAdapter:
         print("---- Session closed:")
 
     def post_message(self, message):
-        message_url = f"https://api.salesforce.com/einstein/ai-agent/v1/sessions/{self.session_id}/messages"
+        message_url = f"https://api.salesforce.com/einstein/ai-agent/v1/sessions/{global_session_id}/messages"
         print(f"---- Message URL: {message_url}")
         headers = {
-            "Authorization": f"Bearer {self.access_token}",
+            "Authorization": f"Bearer {global_access_token}",
             "Accept": "application/json",
             "Content-Type": "application/json",
         }
