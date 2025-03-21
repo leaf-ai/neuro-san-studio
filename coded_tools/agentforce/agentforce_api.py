@@ -7,10 +7,15 @@ from neuro_san.interfaces.coded_tool import CodedTool
 
 from coded_tools.agentforce.agentforce_adapter import AgentforceAdapter
 
-MOCK_RESPONSE = \
+MOCK_RESPONSE_1 = \
 """
-{'messages': [{'type': 'Inform', 'id': 'af4b0a83-5f32-4fa0-9f78-22c1a3522ba3', 'feedbackId': 'b8058c93-d3a4-4586-b83c-ceff44bb2a46', 'planId': 'b8058c93-d3a4-4586-b83c-ceff44bb2a46', 'isContentSafe': True, 'message': "Here are Lauren Bailey's most recent cases:\n\n1. Subject: Cognizant Test Case\n   - Status: New\n2. Subject: Question on products\n   - Status: New\n3. Subject: I have a product suggestion.\n   - Status: Closed\n4. Subject: I have a question about my bill\n   - Status: New\n5. Subject: Can you expedite my order?\n   - Status: Closed\n\nIf you need more details or assistance with any of these cases, just let me know!", 'result': [], 'citedReferences': []}], '_links': {'self': None, 'messages': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf/messages'}, 'messagesStream': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf/messages/stream'}, 'session': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/agents/0XxKc000000kvtXKAQ/sessions'}, 'end': {'href': 'https://api.salesforce.com/einstein/ai-agent/v1/sessions/e3a973c5-e4ad-44af-b43f-4a23601516cf'}}}"
+{"messages": [{"type": "Inform", "id": "04d35a5d-6011-4eb9-88a9-2897f49a6bdc", "feedbackId": "7d92a297-dc95-4306-b638-42f6e36ddfab", "planId": "7d92a297-dc95-4306-b638-42f6e36ddfab", "isContentSafe": true, "message": "Sure, I can help with that. Could you please provide Lauren Bailey's email address to look up her cases?", "result": [], "citedReferences": []}], "_links": {"self": null, "messages": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314/messages"}, "messagesStream": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314/messages/stream"}, "session": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/agents/0XxKc000000kvtXKAQ/sessions"}, "end": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314"}}}
 """
+MOCK_RESPONSE_2 = \
+"""
+{"messages": [{"type": "Inform", "id": "caf90c84-a150-4ccd-8430-eb29189696ac", "feedbackId": "e24505db-1edd-4b76-b5f5-908be083fc67", "planId": "e24505db-1edd-4b76-b5f5-908be083fc67", "isContentSafe": true, "message": "It looks like there are no recent cases associated with Lauren Bailey's email address. Is there anything else I can assist you with?", "result": [], "citedReferences": []}], "_links": {"self": null, "messages": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314/messages"}, "messagesStream": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314/messages/stream"}, "session": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/agents/0XxKc000000kvtXKAQ/sessions"}, "end": {"href": "https://api.salesforce.com/einstein/ai-agent/v1/sessions/06518755-b897-4311-afea-2aab1df77314"}}}
+"""
+
 
 class AgentforceAPI(CodedTool):
     """
@@ -31,7 +36,7 @@ class AgentforceAPI(CodedTool):
                 by the calling agent. This dictionary is to be treated as read-only.
 
                 The argument dictionary expects the following keys:
-                    "inquiry" the date on which to check the balances (format: 'YYYY-MM-DD')
+                    "inquiry": the user request to the Agentforce API, as a string.
 
         :param sly_data: A dictionary whose keys are defined by the agent hierarchy,
                 but whose values are meant to be kept out of the chat stream.
@@ -53,22 +58,30 @@ class AgentforceAPI(CodedTool):
                 a text string an error message in the format:
                 "Error: <error message>"
         """
+        # Parse arguments
         inquiry: str = args.get("inquiry")
-        # final_response: Dict[str, Any] = {}
+        session_id: str = args.get("session_id", None)
+        access_token: str = args.get("access_token", None)
+
         tool_name = self.__class__.__name__
         print(f"========== Calling {tool_name} ==========")
         print(f"Inquiry: {inquiry}")
+        print(f"Session ID: {session_id}")
+        print(f"Access Token: {access_token}")
+
         if self.agentforce.is_configured:
             print("AgentforceAdapter is configured. Fetching response...")
             res = self.agentforce.post_message(inquiry)
         else:
-            print("WARNING: AgentforceAdapter is not configured. Using mock response")
-            res = "This is amock response"
-        res = json.dumps(res)
-        message_list = json.loads(res).get("messages", "No messages received")
+            print("WARNING: AgentforceAdapter is NOT configured. Using a mock response")
+            if session_id is None:
+                # No session yet. This is the first request the user makes
+                res = json.loads(MOCK_RESPONSE_1)
+            else:
+                # The user has a session. This is a follow-up request
+                res = json.loads(MOCK_RESPONSE_2)
+        message_list = res.get("messages", "No messages received")
         final_response = message_list[0].get("message", "No message received")
-        # final_response["message"] = message_list[0].get("message", "No message received")
-        # final_response["app_name"] = tool_name
         print("-----------------------")
         print("Agentforce response: ", final_response)
         print(f"========== Done with {tool_name} ==========")
@@ -79,6 +92,12 @@ class AgentforceAPI(CodedTool):
 if __name__ == "__main__":
     agentforce_tool = AgentforceAPI()
 
-    af_inquiry = "find training resources for Salesforce"
+    af_inquiry = "Can you give me a list of Lauren Bailey's most recent cases?"
     # Get response
     af_res = agentforce_tool.invoke(args={"inquiry": af_inquiry}, sly_data={})
+    # Follow up - session exists now
+    af_inquiry = "lbailey@example.com"
+    params = {"inquiry": af_inquiry,
+              "session_id": "06518755-b897-4311-afea-2aab1df77314",
+              "access_token": "1234567890"}
+    af_res_2 = agentforce_tool.invoke(args=params, sly_data={})
