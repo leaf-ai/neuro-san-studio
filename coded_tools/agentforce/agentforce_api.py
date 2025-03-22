@@ -61,6 +61,7 @@ class AgentforceAPI(CodedTool):
                  "response": the response message from Agentforce.
         """
         # Parse the arguments
+        print(f"args: {args}")
         inquiry: str = args.get("inquiry")
         session_id: Optional[str] = args.get("session_id", None)
         access_token: Optional[str] = args.get("access_token", None)
