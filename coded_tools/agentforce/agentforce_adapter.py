@@ -134,7 +134,7 @@ class AgentforceAdapter:
             "Authorization": f"Bearer {access_token}",
             "x-session-end-reason": "UserRequest",
         }
-        response = requests.delete(close_session_url, headers=headers)
+        requests.delete(close_session_url, headers=headers)
         print(f"    Session {session_id} closed:")
 
     def post_message(self, message: str, session_id: str = None, access_token: str = None) -> Dict[str, Any]:
@@ -153,7 +153,7 @@ class AgentforceAdapter:
         - access_token: the corresponding access_token
         - response: the response message from Agentforce.
         """
-        if session_id is None:
+        if session_id in (None, "None"):
             session_id, access_token = self.create_session()
         message_url = f"https://api.salesforce.com/einstein/ai-agent/v1/sessions/{session_id}/messages"
         print(f"---- Message URL: {message_url}")

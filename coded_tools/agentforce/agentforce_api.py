@@ -75,7 +75,7 @@ class AgentforceAPI(CodedTool):
             response = self.agentforce.post_message(inquiry, session_id, access_token)
         else:
             print("WARNING: AgentforceAdapter is NOT configured. Using a mock response")
-            if session_id is None:
+            if session_id in (None, "None"):
                 # No session yet. This is the first request the user makes
                 response = MOCK_RESPONSE_1
             else:

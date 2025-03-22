@@ -22,14 +22,14 @@
         # he is the only one with no parameters in his function definition,
         # and therefore he needs to talk to the outside world to get things rolling.
         {
-            "name": "Agentforce Agent",
+            "name": "Agentforce",
 
             # Note that there are no parameters defined for this guy's "function" key.
             # This is the primary way to identify this tool as a front-man,
             # distinguishing it from the rest of the tools.
 
         "function": {
-            "description": "Assist the user with queries related to Salesforce CRM or AgentForce."
+            "description": "Assist the user with queries related to Salesforce CRM or Agentforce."
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -45,14 +45,14 @@
          },
 
             "instructions": """
-You are the `Agentforce Agent`.
+You are the `Agentforce`.
 Delegate the inquiry and the requirements to your down-chain tools.
 Use your tool to respond to the inquiry.
 """,
-            "tools": ["agentforce_adapter"]
+            "tools": ["Agentforce_API"]
         },
         {
-            "name": "agentforce_adapter",
+            "name": "Agentforce_API",
             "function": {
                 "description": """
 Assist caller with the answer or solution to their inquiry by using your tool.
@@ -63,10 +63,18 @@ Assist caller with the answer or solution to their inquiry by using your tool.
                     "properties": {
                         "inquiry": {
                             "type": "string",
-                            "description": "Inquiry for which response is sought."
+                            "description": "The inquiry for which response is sought."
+                        },
+                        "session_id": {
+                            "type": "string",
+                            "description": "The session ID to use for the inquiry to continue the conversation. Can be found in previous response. If not available, use 'None' and that will start a new conversation."
+                        },
+                        "access_token": {
+                            "type": "string",
+                            "description": "The access token corresponding to the session_id. Can be found in previous response. If not available, use 'None' and that will start a new conversation."
                         },
                     },
-                    "required": ["inquiry"]
+                    "required": ["inquiry, session_id, access_token"]
                 }
             },
             "class": "agentforce_api.AgentforceAPI",
