@@ -62,10 +62,10 @@ Below is a simplified view of the reference project structure. You can adapt it 
 ├── requirements.txt
 ├── run.py
 └── wheels_private
-    ├── leaf_common-1.2.18-py3-none-any.whl
-    ├── leaf_server_common-0.1.15-py3-none-any.whl
-    ├── neuro_san-0.4.6-py3-none-any.whl
-    └── neuro_san_web_client-0.1.3-py3-none-any.whl
+    ├── leaf_common-x.x.x-py3-none-any.whl
+    ├── leaf_server_common-x.x.x-py3-none-any.whl
+    ├── neuro_san-x.x.x-py3-none-any.whl
+    └── neuro_san_web_client-x.x.x-py3-none-any.whl
 ```
 
 ### Key directories and files:
@@ -87,7 +87,7 @@ To get your environment up and running, you will need to install several wheel f
 
 1. `neuro_san`:
     - This is the core library for multi-agent orchestration.
-2. `neuro_san_web_client-0.1.3-py3-none-any.whl`:
+2. `neuro_san_web_client`:
     - This package provides a Flask web application UI that interacts with the `neuro-san` backend.
     - Internally, it uses the pyvis library (specifically `vis-9.1.2`) for rendering network graphs on the web page.
 3. `leaf_common` and `leaf_server_common`:
@@ -113,15 +113,9 @@ python -m venv venv
 # For Mac/Linux
 source venv/bin/activate && export PYTHONPATH=`pwd`
 
-# 4) Install the required Python packages
+# 4) Install the required Python packages.
+# That will install the wheels from wheels_private/
 pip install -r requirements.txt
-
-# 5) Now install the wheel files from wheels_private/
-# Make sure the version numbers match your environment
-pip install wheels_private/neuro_san-0.4.5-py3-none-any.whl
-pip install wheels_private/neuro_san_web_client-0.1.3-py3-none-any.whl
-pip install wheels_private/leaf_common-1.2.18-py3-none-any.whl
-pip install wheels_private/leaf_server_common-0.1.15-py3-none-any.whl
 ```
 
 Please find the detailed instructions to run an agent network along with a web client here:
