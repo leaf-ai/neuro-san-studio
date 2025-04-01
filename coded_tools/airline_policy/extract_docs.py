@@ -26,7 +26,7 @@ class ExtractDocs(CodedTool):
             "Embargoes": "coded_tools/knowdocs/international",
         }
 
-    def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> Union[Dict[str, Any], str]:
+    def async_invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> Union[Dict[str, Any], str]:
         """
         :param args: An argument dictionary with the following keys:
             - "directory" (str): The directory containing the documents.
