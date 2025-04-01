@@ -16,5 +16,7 @@
     "advanced_calculator.hocon": true,
     "smart_home.hocon": true,
     "smart_home_onf.hocon": true,
-    "agent_network_generator.hocon" : true
+    "agent_network_generator.hocon" : true,
+    "music_nerd.hocon": true,
+    "music_nerd_pro.hocon": true,
 }
