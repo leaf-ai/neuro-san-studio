@@ -146,7 +146,6 @@ class NeuroSanRunner:
         ]
         self.server_process = self.start_process(server_command, "SERVER", "logs/server.log")
 
-        print(f"CLIENT: {self.config['agent_name']}")
         # Start web client (Log to logs/client.log)
         client_command = [
             sys.executable, "-u", "-m", "neuro_san_web_client.app",
