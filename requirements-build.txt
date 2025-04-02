@@ -1,0 +1,13 @@
+# We separate out requirements that are specific to the build, but not
+# necessary for operation to minimize the size of containers
+
+# Tests
+pytest==8.3.3
+pytest-timer==1.0.0
+timeout-decorator==0.5.0
+coverage==7.6.1
+pytest-cov==5.0.0
+
+# Code quality
+flake8==7.1.1
+pylint==3.3.1
