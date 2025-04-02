@@ -9,6 +9,9 @@ They should help developers to get started with the library and to understand ho
   - [(Optional) Details for manual run](#optional-details-for-manual-run)
     - [Start the client](#start-the-client)
       - [Option 1: Command line interface](#option-1-command-line-interface)
+    - [\*\* Using `nsflow` as a developer-oriented client\*\*](#-using-nsflow-as-a-developer-oriented-client)
+      - [**Step 1: Install nsflow dependencies**](#step-1-install-nsflow-dependencies)
+      - [**Step 2: Start the Backend \& Frontend**](#step-2-start-the-backend--frontend)
     - [Query the client](#query-the-client)
       - [Option 2: Web client](#option-2-web-client)
   - [Tutorial](#tutorial)
@@ -138,6 +141,31 @@ Then start the client:
 ```bash
 python -m neuro_san.client.agent_cli --connection service --agent hello_world
 ```
+
+---
+
+### ** Using `nsflow` as a developer-oriented client**
+If you want to use neuro-san with a FastAPI-based developer-oriented client, follow these steps:
+
+#### **Step 1: Install nsflow dependencies**
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+#### **Step 2: Start the Backend & Frontend**
+
+From project root
+```bash
+python -m nsflow.run
+```
+
+By default:
+- **frontend** will be available at: `http://127.0.0.1:4173`
+- **OpenAPI specs** will be available at: `http://127.0.0.1:4173/docs`
+
+---
 
 ### Query the client
 When prompted, ask a question to the agent network. For example:

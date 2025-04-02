@@ -3,5 +3,7 @@ wheels_private/leaf_common-1.2.20-py3-none-any.whl
 wheels_private/leaf_server_common-0.1.17-py3-none-any.whl
 wheels_private/neuro_san-0.5.8-py3-none-any.whl
 wheels_private/neuro_san_web_client-0.1.4-py3-none-any.whl
+wheels_private/nsflow-0.5.5-py3-none-any.whl
+
 # For the airline_policy demo, to extract text from documents
 pypdf2>=3.0.1
