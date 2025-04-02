@@ -17,7 +17,6 @@ class NeuroSanRunner:
         self.neuro_san_server_host = "localhost"
         self.neuro_san_server_port = 30013
         self.neuro_san_web_client_port = 5003
-        self.neuro_san_agent_name = "hello_world"
         self.thinking_file = "C:\\tmp\\agent_thinking.txt" if self.is_windows else "/tmp/agent_thinking.txt"
 
         # Parse command-line arguments
@@ -37,7 +36,6 @@ class NeuroSanRunner:
         parser.add_argument('--server-host', type=str, default=self.neuro_san_server_host, help="Host address for the Neuro SAN server")
         parser.add_argument('--server-port', type=int, default=self.neuro_san_server_port, help="Port number for the Neuro SAN server")
         parser.add_argument('--web-client-port', type=int, default=self.neuro_san_web_client_port, help="Port number for the web client")
-        parser.add_argument('--agent-name', type=str, default=self.neuro_san_agent_name, help="Agent name for the session")
         parser.add_argument('--thinking-file', type=str, default=self.thinking_file, help="Path to the agent thinking file")
         parser.add_argument('--demo-mode', action='store_true', help="Run in demo mode, using default neuro-san settings")
 
@@ -155,7 +153,6 @@ class NeuroSanRunner:
             "--server-host", self.config["server_host"],
             "--server-port", str(self.config["server_port"]),
             "--web-client-port", str(self.config["web_client_port"]),
-            "--agent-name", self.config["agent_name"],
             "--thinking-file", self.config["thinking_file"]
         ]
         self.app_process = self.start_process(client_command, "WEB CLIENT", "logs/client.log")
