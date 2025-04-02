@@ -10,20 +10,20 @@ class ExtractDocs(CodedTool):
     Returns a dictionary mapping each PDF file name to its extracted text.
     """
     def __init__(self):
-        self.default_path = ["coded_tools/knowdocs/Help Center.txt"]
+        self.default_path = ["coded_tools/airline_policy/knowdocs/Help Center.txt"]
         
         self.docs_path = {
-            "Bag Issues": "coded_tools/knowdocs/baggage/bag-issues",
-            "Carry On Baggage": "coded_tools/knowdocs/baggage/carryon",
-            "Checked Baggage": "coded_tools/knowdocs/baggage/checked",
-            "Special Items": "coded_tools/knowdocs/baggage/special-items",
+            "Bag Issues": "coded_tools/airline_policy/knowdocs/baggage/bag-issues",
+            "Carry On Baggage": "coded_tools/airline_policy/knowdocs/baggage/carryon",
+            "Checked Baggage": "coded_tools/airline_policy/knowdocs/baggage/checked",
+            "Special Items": "coded_tools/airline_policy/knowdocs/baggage/special-items",
 
-            "Military Personnel": "coded_tools/knowdocs/flight/military-personnel",
-            "Mileage Plus": "coded_tools/knowdocs/flight/mileage-plus",
-            "Basic Economy Restrictions": "coded_tools/knowdocs/flight/basic-econ",
+            "Military Personnel": "coded_tools/airline_policy/knowdocs/flight/military-personnel",
+            "Mileage Plus": "coded_tools/airline_policy/knowdocs/flight/mileage-plus",
+            "Basic Economy Restrictions": "coded_tools/airline_policy/knowdocs/flight/basic-econ",
             
-            "International Checked Baggage": "coded_tools/knowdocs/international",
-            "Embargoes": "coded_tools/knowdocs/international",
+            "International Checked Baggage": "coded_tools/airline_policy/knowdocs/international",
+            "Embargoes": "coded_tools/airline_policy/knowdocs/international",
         }
 
     def async_invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> Union[Dict[str, Any], str]:
