@@ -5,13 +5,9 @@ They should help developers to get started with the library and to understand ho
 - [Demos for the neuro-san library](#demos-for-the-neuro-san-library)
   - [Installation](#installation)
   - [Run](#run)
-    - [Option 1: Using the web-client interface](#option-1-using-the-web-client-interface)
-  - [(Optional) Details for manual run](#optional-details-for-manual-run)
-    - [Start the client](#start-the-client)
-      - [Option 1: Command line interface](#option-1-command-line-interface)
-      - [Query the client](#query-the-client)
-      - [Option 2: Web client](#option-2-web-client)
-      - [Option 3: Using `nsflow` as a developer-oriented client](#option-3-using-nsflow-as-a-developer-oriented-client)
+    - [Option 1: Command Line Interface](#option-1-command-line-interface)
+    - [Option 2: Using a basic Web Client interface](#option-2-using-a-basic-web-client-interface)
+    - [Option 3: Using `nsflow` as a developer-oriented web client](#option-3-using-nsflow-as-a-developer-oriented-web-client)
   - [Tutorial](#tutorial)
   - [Quick-Start](#quick-start)
     - [Hello World](#hello-world)
@@ -79,9 +75,50 @@ Other models are supported too but will require proper setup.
 
 ## Run
 
-There are multiple ways in which we can now use the neuro-san
+There are multiple ways in which we can now use the neuro-san server with a client
 
-### Option 1: Using the web-client interface
+### Option 1: Command Line Interface
+
+- Export the following environment variables:
+```bash
+# Point the server to the manifest file containing the agent network configurations
+export AGENT_MANIFEST_FILE="./registries/manifest.hocon"
+# Point the server to the directory containing the agent Python tools
+export AGENT_TOOL_PATH="./coded_tools"
+```
+
+- Start the server:
+```bash
+python -m neuro_san.service.agent_main_loop --port 30011
+```
+
+- Start the client:
+From another terminal window, navigate to the repo's folder and activate the virtual environment:
+```bash
+source venv/bin/activate && export PYTHONPATH=`pwd`
+```
+
+Then start the client:
+```bash
+python -m neuro_san.client.agent_cli --connection service --agent hello_world
+```
+
+- Query the client
+When prompted, ask a question to the `hello_world` agent network. For example:
+```
+I am travelling to a new planet and wish to send greetings to the orb.
+```
+And it should return something like:
+
+    Hello, world.
+
+... but you are dealing with LLMs. Your results will vary!
+
+Type `quit` to exit the client.
+
+---
+
+### Option 2: Using a basic Web Client interface
 
 - Start the server and the client in one single command:
 ```bash
@@ -111,88 +148,26 @@ python -m run --demo-mode
 
 ---
 
-## (Optional) Details for manual run
-
-Export the following environment variables:
-```bash
-# Point the server to the manifest file containing the agent network configurations
-export AGENT_MANIFEST_FILE="./registries/manifest.hocon"
-# Point the server to the directory containing the agent Python tools
-export AGENT_TOOL_PATH="./coded_tools"
-```
-
-and start the server:
-
-```bash
-python -m neuro_san.service.agent_main_loop --port 30011
-```
-
-### Start the client
-
-#### Option 1: Command line interface
-
-From another terminal, navigate to the repo's folder and activate the virtual environment:
-```bash
-source venv/bin/activate && export PYTHONPATH=`pwd`
-```
-
-Then start the client:
-
-```bash
-python -m neuro_san.client.agent_cli --connection service --agent hello_world
-```
-
----
-
-#### Query the client
-When prompted, ask a question to the `hello_world` agent network. For example:
-```
-I am travelling to a new planet and wish to send greetings to the orb.
-```
-And it should return something like:
-
-    Hello, world.
-
-... but you are dealing with LLMs. Your results will vary!
-
-Type `quit` to exit the client.
-
----
-
-#### Option 2: Web client
-
-You can also start a web client instead to interact with the agent network:
-
-```bash
-python -m neuro_san_web_client.app
-```
-
-Then navigate to http://127.0.0.1:5001 in your browser. Expand the 'Configuration' section at the bottom of the page, and make sure the 'Agent Network Name' matches the agent network name you specified in the manifest file, minus the .hocon extension. E.g., use 'hello_world' if you have 'hello_world.hocon' in your manifest file.
-
-You can now type your message in the chat box and press 'Send' to interact with the agent network.
-
----
-
-#### Option 3: Using `nsflow` as a developer-oriented client
+### Option 3: Using `nsflow` as a developer-oriented web client
 If you want to use neuro-san with a FastAPI-based developer-oriented client, follow these steps:
 
-- Step 1: Install nsflow dependencies
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-- Step 2: Start the Backend & Frontend
-
-From project root
+- Start the Backend & Frontend, from project root
 ```bash
 python -m nsflow.run
 ```
 
 By default:
-- **frontend** will be available at: `http://127.0.0.1:4173`
-- **OpenAPI specs** will be available at: `http://127.0.0.1:4173/docs`
+- Frontend will be available at: `http://127.0.0.1:4173`
+- OpenAPI specs will be available at: `http://127.0.0.1:4173/docs`
+
+To see the various config options for this app, on terminal
+```bash
+python -m nsflow.run -h
+```
+or
+```bash
+python -m nsflow.run --help
+```
 
 ---
 
