@@ -5,15 +5,13 @@ They should help developers to get started with the library and to understand ho
 - [Demos for the neuro-san library](#demos-for-the-neuro-san-library)
   - [Installation](#installation)
   - [Run](#run)
-  - [(Optional) How to run in demo-mode](#optional-how-to-run-in-demo-mode)
+    - [Option 1: Using the web-client interface](#option-1-using-the-web-client-interface)
   - [(Optional) Details for manual run](#optional-details-for-manual-run)
     - [Start the client](#start-the-client)
       - [Option 1: Command line interface](#option-1-command-line-interface)
-    - [\*\* Using `nsflow` as a developer-oriented client\*\*](#-using-nsflow-as-a-developer-oriented-client)
-      - [**Step 1: Install nsflow dependencies**](#step-1-install-nsflow-dependencies)
-      - [**Step 2: Start the Backend \& Frontend**](#step-2-start-the-backend--frontend)
-    - [Query the client](#query-the-client)
+      - [Query the client](#query-the-client)
       - [Option 2: Web client](#option-2-web-client)
+      - [Option 3: Using `nsflow` as a developer-oriented client](#option-3-using-nsflow-as-a-developer-oriented-client)
   - [Tutorial](#tutorial)
   - [Quick-Start](#quick-start)
     - [Hello World](#hello-world)
@@ -81,7 +79,11 @@ Other models are supported too but will require proper setup.
 
 ## Run
 
-Start the server and the client in one single command:
+There are multiple ways in which we can now use the neuro-san
+
+### Option 1: Using the web-client interface
+
+- Start the server and the client in one single command:
 ```bash
 python -m run
 ```
@@ -90,7 +92,7 @@ The client and server logs will show on the screen,
 and will also be saved to `logs/server.log` and `logs/client.log` respectively.
 As a default, on a web browser you can now navigate to http://127.0.0.1:5003/ to start using the application.
 
-To see the various config options for this app, on terminal
+- To see the various config options for this app, on terminal
 ```bash
 python -m run -h
 ```
@@ -99,9 +101,7 @@ or
 python -m run --help
 ```
 
----
-
-## (Optional) How to run in demo-mode
+- (Optional) How to run in demo-mode
 
 This is really meant to experience some of the default multi-agent networks that are available in the neuro-san library.
 To use it, start the server and the client in one single command:
@@ -144,31 +144,8 @@ python -m neuro_san.client.agent_cli --connection service --agent hello_world
 
 ---
 
-### ** Using `nsflow` as a developer-oriented client**
-If you want to use neuro-san with a FastAPI-based developer-oriented client, follow these steps:
-
-#### **Step 1: Install nsflow dependencies**
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-#### **Step 2: Start the Backend & Frontend**
-
-From project root
-```bash
-python -m nsflow.run
-```
-
-By default:
-- **frontend** will be available at: `http://127.0.0.1:4173`
-- **OpenAPI specs** will be available at: `http://127.0.0.1:4173/docs`
-
----
-
-### Query the client
-When prompted, ask a question to the agent network. For example:
+#### Query the client
+When prompted, ask a question to the `hello_world` agent network. For example:
 ```
 I am travelling to a new planet and wish to send greetings to the orb.
 ```
@@ -179,6 +156,8 @@ And it should return something like:
 ... but you are dealing with LLMs. Your results will vary!
 
 Type `quit` to exit the client.
+
+---
 
 #### Option 2: Web client
 
@@ -191,6 +170,29 @@ python -m neuro_san_web_client.app
 Then navigate to http://127.0.0.1:5001 in your browser. Expand the 'Configuration' section at the bottom of the page, and make sure the 'Agent Network Name' matches the agent network name you specified in the manifest file, minus the .hocon extension. E.g., use 'hello_world' if you have 'hello_world.hocon' in your manifest file.
 
 You can now type your message in the chat box and press 'Send' to interact with the agent network.
+
+---
+
+#### Option 3: Using `nsflow` as a developer-oriented client
+If you want to use neuro-san with a FastAPI-based developer-oriented client, follow these steps:
+
+- Step 1: Install nsflow dependencies
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+- Step 2: Start the Backend & Frontend
+
+From project root
+```bash
+python -m nsflow.run
+```
+
+By default:
+- **frontend** will be available at: `http://127.0.0.1:4173`
+- **OpenAPI specs** will be available at: `http://127.0.0.1:4173/docs`
 
 ---
 
