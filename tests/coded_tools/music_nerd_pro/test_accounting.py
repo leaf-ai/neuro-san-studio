@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from neuro_san.coded_tools.music_nerd_pro.accounting import Accountant
+from coded_tools.music_nerd_pro.accounting import Accountant
 
 
 class TestAccounting(TestCase):
