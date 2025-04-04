@@ -3,6 +3,7 @@ from typing import Dict
 from typing import Union
 
 import logging
+import aiofiles  # Import for asynchronous file operations
 
 from neuro_san.interfaces.coded_tool import CodedTool
 
@@ -173,8 +174,8 @@ class GetAgentNetworkHocon(CodedTool):
         logger.info("The resulting agent network: \n %s", str(the_agent_network_hocon_str))
         if WRITE_TO_FILE:
             file_path = OUTPUT_PATH + the_agent_network_name + ".hocon"
-            with open(file_path, 'w') as file:
-                file.write(the_agent_network_hocon_str)
+            async with aiofiles.open(file_path, 'w') as file:
+                await file.write(the_agent_network_hocon_str)
         logger.info(">>>>>>>>>>>>>>>>>>>DONE !!!>>>>>>>>>>>>>>>>>>")
         return the_agent_network_hocon_str
 
