@@ -188,9 +188,9 @@ class GetAgentNetworkHocon(CodedTool):
             tools = ""
             if agent["down_chains"]:
                 for j, down_chain in enumerate(agent["down_chains"]):
-                    tools = tools + "\"" + down_chain
+                    tools = tools + "\"" + down_chain + "\""
                     if j < len(agent["down_chains"]) - 1:
-                        tools = tools + "\","
+                        tools = tools + ","
             if i == 0: # top agent
                 an_agent = TOP_AGENT_TEMPLATE % (agent_name, agent["instructions"], tools)
             elif agent["down_chains"]:

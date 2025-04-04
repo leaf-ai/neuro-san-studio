@@ -151,6 +151,11 @@ python -m run --demo-mode
 ### Option 3: Using `nsflow` as a developer-oriented web client
 If you want to use neuro-san with a FastAPI-based developer-oriented client, follow these steps:
 
+- Install nsflow. Make sure to replace `x.x.x` with the actual version you want to install.
+```bash
+pip install wheels_private/nsflow-x.x.x-py3-none-any.whl
+```
+
 - Start the Backend & Frontend, from project root
 ```bash
 python -m nsflow.run
