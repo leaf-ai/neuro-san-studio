@@ -46,9 +46,7 @@
             "instructions": """
 You are the `Agentforce` agent.
 Before using a tool, explain your reasoning.
-Use your tool to respond to the inquiry, using the session_id and access_token from your historical context, if any.
-If you couldn't find any session_id or access_token in your historical context, please mention it.
-Always mention the session_id and access_token in your response to make it possible to continue the conversation.
+Use your tools to respond to the inquiry.
 """,
             "tools": ["Agentforce_API"]
         },
@@ -66,16 +64,8 @@ Assist caller with the answer or solution to their inquiry by using your tool.
                             "type": "string",
                             "description": "The inquiry for which response is sought."
                         },
-                        "session_id": {
-                            "type": "string",
-                            "description": "The session ID to use for the inquiry to continue the conversation. Can be found in previous response. If not available, use 'None' and that will start a new conversation."
-                        },
-                        "access_token": {
-                            "type": "string",
-                            "description": "The access token corresponding to the session_id. Can be found in previous response. If not available, use 'None' and that will start a new conversation."
-                        },
                     },
-                    "required": ["inquiry, session_id, access_token"]
+                    "required": ["inquiry"]
                 }
             },
             "class": "agentforce_api.AgentforceAPI",
