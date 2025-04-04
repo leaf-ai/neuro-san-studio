@@ -192,7 +192,7 @@ if __name__ == "__main__":
     # Client id and client secret are read from the environment variables.
     agentforce = AgentforceAdapter()
     # message = "Can you help me find training resources for Salesforce?"
-    a_message = "Can you give me a list of Lauren Bailey's most recent cases?"
+    a_message = "Can you give me a list of Jane Doe's most recent cases?"
     print(f"USER: {a_message}")
     # Post the message to the Agentforce API
     a_response = agentforce.post_message(a_message)
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     a_access_token = a_response["access_token"]
     a_response_message = a_response["response"]["messages"][0]["message"]
     print(f"AGENTFORCE: {a_response_message}")
-    a_second_message = "lbailey@example.com"
+    a_second_message = "jdoe@example.com"
     print(f"USER: {a_second_message}")
     # Continue the conversation by using the session_id and access_token
     a_second_response = agentforce.post_message(a_second_message, a_session_id, a_access_token)
