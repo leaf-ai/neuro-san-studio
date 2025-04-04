@@ -28,24 +28,23 @@
             # This is the primary way to identify this tool as a front-man,
             # distinguishing it from the rest of the tools.
 
-        "function": {
-            "description": "Assist the user with queries related to Salesforce CRM or Agentforce."
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "inquiry": {
-                        "type": "string",
-                        "description": """
+            "function": {
+                "description": "Assist the user with queries related to Salesforce CRM or Agentforce."
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "inquiry": {
+                            "type": "string",
+                            "description": """
     An inquiry from a user.
     """
+                        },
                     },
-                },
-                "required": ["inquiry"]
-            }
-         },
-
+                    "required": ["inquiry"]
+                }
+            },
             "instructions": """
-You are the `Agentforce`.
+You are the `Agentforce` agent.
 Before using a tool, explain your reasoning.
 Use your tool to respond to the inquiry, using the session_id and access_token from your historical context, if any.
 If you couldn't find any session_id or access_token in your historical context, please mention it.
