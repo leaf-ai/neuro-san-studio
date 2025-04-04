@@ -20,7 +20,7 @@
 #
 
 export SERVICE_TAG=${SERVICE_TAG:-neuro-san-demos}
-export SERVICE_VERSION=${SERVICE_VERSION:-0.0.6}
+export SERVICE_VERSION=${SERVICE_VERSION:-0.0.7}
 
 function check_directory() {
     working_dir=$(pwd)
