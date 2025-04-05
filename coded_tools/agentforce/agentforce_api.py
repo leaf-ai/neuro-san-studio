@@ -47,7 +47,7 @@ class AgentforceAPI(CodedTool):
         Calls the Agentforce API to get a response to the user's inquiry. If no session was provided in the sly_data,
         a new session is created. Otherwise, the existing session is reused to keep the conversation going.
         WARNING: The AgentforceAdapter constructor reads the AGENTFORCE_CLIENT_ID and AGENTFORCE_CLIENT_SECRET
-        environment variables. If they are NOT provided, the adapter will return mock responses.
+        environment variables. If they are NOT provided, this `invoke` call will return mock responses.
 
         :param args: A dictionary with the following keys:
                     "inquiry": the user request to the Agentforce API, as a string.
