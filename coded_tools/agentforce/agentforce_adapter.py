@@ -26,8 +26,10 @@ class AgentforceAdapter:
     def __init__(self, client_id: str = None, client_secret: str = None):
         """
         Constructs a Salesforce Agentforce Adapter.
-        :param client_id: the ID of the Agentforce client.
-        :param client_secret: the secret of the Agentforce client.
+        Uses the passed client_id, if any, or the AGENTFORCE_CLIENT_ID environment variable.
+        Uses the passed client_secret, if any, or the AGENTFORCE_CLIENT_SECRET environment variable.
+        :param client_id: the ID of the Agentforce client or None to get it from the environment variables.
+        :param client_secret: the secret of the Agentforce client or None to get it from the environment variables.
         """
         # Get the client_id and client_secret from the environment variables if not provided
         if client_id is None:
@@ -47,8 +49,7 @@ class AgentforceAdapter:
 
         if client_id is None or client_secret is None:
             print("ERROR: AgentforceAdapter is NOT configured. Please check your parameters or environment variables.")
-            print("WARNING: Using mock responses.")
-            # The service is not configured. We cannot query the API, but we can still use a mock response.
+            # The service is not configured. We cannot query the API, but we can still use mock responses.
             self.is_configured = False
         else:
             # The service is configured. We can query the API.
