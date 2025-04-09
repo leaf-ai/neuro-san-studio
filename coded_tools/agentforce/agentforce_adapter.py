@@ -35,35 +35,15 @@ class AgentforceAdapter:
         """
         # Get the domain_url and agent_id from the environment variables if not provided
         if my_domain_url is None:
-            print("AgentforceAdapter: getting AGENTFORCE_MY_DOMAIN_URL from environment variables...")
-            my_domain_url = os.getenv("AGENTFORCE_MY_DOMAIN_URL", None)
-            if my_domain_url is None:
-                print("AgentforceAdapter: AGENTFORCE_MY_DOMAIN_URL is NOT defined")
-            else:
-                print("AgentforceAdapter: my_domain_url found in environment variables")
+            my_domain_url = AgentforceAdapter._get_env_variable("AGENTFORCE_MY_DOMAIN_URL")
         if agent_id is None:
-            print("AgentforceAdapter: getting AGENTFORCE_AGENT_ID from environment variables...")
-            agent_id = os.getenv("AGENTFORCE_AGENT_ID", None)
-            if agent_id is None:
-                print("AgentforceAdapter: AGENTFORCE_AGENT_ID is NOT defined")
-            else:
-                print("AgentforceAdapter: agent_id found in environment variables")
+            agent_id = AgentforceAdapter._get_env_variable("AGENTFORCE_AGENT_ID")
 
         # Get the client_id and client_secret from the environment variables if not provided
         if client_id is None:
-            print("AgentforceAdapter: getting AGENTFORCE_CLIENT_ID from environment variables...")
-            client_id = os.getenv("AGENTFORCE_CLIENT_ID", None)
-            if client_id is None:
-                print("AgentforceAdapter: AGENTFORCE_CLIENT_ID is NOT defined")
-            else:
-                print("AgentforceAdapter: client_id found in environment variables")
+            client_id = AgentforceAdapter._get_env_variable("AGENTFORCE_CLIENT_ID")
         if client_secret is None:
-            print("AgentforceAdapter: getting AGENTFORCE_CLIENT_SECRET from environment variables...")
-            client_secret = os.getenv("AGENTFORCE_CLIENT_SECRET", None)
-            if client_secret is None:
-                print("AgentforceAdapter: AGENTFORCE_CLIENT_SECRET is NOT defined")
-            else:
-                print("AgentforceAdapter: client_secret found in environment variables")
+            client_secret = AgentforceAdapter._get_env_variable("AGENTFORCE_CLIENT_SECRET")
 
         if my_domain_url is None or agent_id is None or client_id is None or client_secret is None:
             print("ERROR: AgentforceAdapter is NOT configured. Please check your parameters or environment variables.")
@@ -77,6 +57,16 @@ class AgentforceAdapter:
             self.agent_id = agent_id
             self.client_id = client_id
             self.client_secret = client_secret
+
+    @staticmethod
+    def _get_env_variable(env_variable_name: str) -> str:
+        print(f"AgentforceAdapter: getting {env_variable_name} from environment variables...")
+        env_var = os.getenv(env_variable_name, None)
+        if env_var is None:
+            print(f"AgentforceAdapter: {env_variable_name} is NOT defined")
+        else:
+            print(f"AgentforceAdapter: {env_variable_name} FOUND in environment variables")
+        return env_var
 
     def create_session(self) -> (str, str):
         """
