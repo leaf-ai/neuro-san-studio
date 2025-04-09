@@ -26,8 +26,12 @@ class AgentforceAdapter:
                  client_secret: str = None):
         """
         Constructs a Salesforce Agentforce Adapter.
-        Uses the passed client_id, if any, or the AGENTFORCE_CLIENT_ID environment variable.
-        Uses the passed client_secret, if any, or the AGENTFORCE_CLIENT_SECRET environment variable.
+        Uses the passed parameters, if any, or the corresponding environment variables:
+        - AGENTFORCE_MY_DOMAIN_URL
+        - AGENTFORCE_AGENT_ID
+        - AGENTFORCE_CLIENT_ID
+        - AGENTFORCE_CLIENT_SECRET
+
         :param my_domain_url: the URL of the Agentforce domain or None to get it from the environment variables.
         :param agent_id: the ID of the Agentforce agent or None to get it from the environment variables.
         :param client_id: the ID of the Agentforce client or None to get it from the environment variables.
