@@ -122,6 +122,31 @@ LEAF_NODE_AGENT_TEMPLATE = ("        {\n"
 "        },\n")
 
 
+async def modify_registry(the_agent_network_hocon_str, the_agent_network_name):
+    # Write the agent network file
+    file_path = OUTPUT_PATH + the_agent_network_name + ".hocon"
+    async with aiofiles.open(file_path, 'w') as file:
+        await file.write(the_agent_network_hocon_str)
+    # Update the manifest.hocon file
+    manifest_path = OUTPUT_PATH + "manifest.hocon"
+    manifest_entry = f'    "{the_agent_network_name}.hocon": true,'
+    # Read the current manifest content
+    async with aiofiles.open(manifest_path, 'r') as file:
+        manifest_content = await file.read()
+    # Find the position to insert the new entry (before the closing brace)
+    insert_position = manifest_content.rfind('}')
+    if insert_position != -1:
+        # Check if the entry already exists to avoid duplicates
+        if f'"{the_agent_network_name}.hocon"' not in manifest_content:
+            # Insert the new entry
+            updated_content = (manifest_content[:insert_position] + "\n" +
+                               manifest_entry + manifest_content[insert_position:])
+
+            # Write the updated content back to the manifest file
+            async with aiofiles.open(manifest_path, 'w') as file:
+                await file.write(updated_content)
+
+
 class GetAgentNetworkHocon(CodedTool):
     """
     CodedTool implementation which provides a way to get a full hocon of a designed agent network from the sly data
@@ -173,9 +198,7 @@ class GetAgentNetworkHocon(CodedTool):
         the_agent_network_hocon_str = self.get_agent_network_hocon(the_agent_network_name)
         logger.info("The resulting agent network: \n %s", str(the_agent_network_hocon_str))
         if WRITE_TO_FILE:
-            file_path = OUTPUT_PATH + the_agent_network_name + ".hocon"
-            async with aiofiles.open(file_path, 'w') as file:
-                await file.write(the_agent_network_hocon_str)
+            await modify_registry(the_agent_network_hocon_str, the_agent_network_name)
         logger.info(">>>>>>>>>>>>>>>>>>>DONE !!!>>>>>>>>>>>>>>>>>>")
         return the_agent_network_hocon_str
 
