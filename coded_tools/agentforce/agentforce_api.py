@@ -40,7 +40,7 @@ class AgentforceAPI(CodedTool):
         Constructs an AgentforceAPI object.
         """
         # Construct an AgentforceAdapter object using environment variables
-        self.agentforce = AgentforceAdapter(None, None)
+        self.agentforce = AgentforceAdapter()
 
     def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]) -> str:
         """

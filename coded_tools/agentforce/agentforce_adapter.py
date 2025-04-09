@@ -7,20 +7,21 @@ import requests
 import uuid
 
 
-# Einstein API URLs
+# Domain and agent IDs
 AGENT_ID = "0XxKc000000kvtXKAQ"
-BASE_URL = "https://api.salesforce.com/einstein/ai-agent/v1"
-CLOSE_SESSION_URL = f"{BASE_URL}/sessions"
-OPEN_SESSION_URL = f"{BASE_URL}/agents/{AGENT_ID}/sessions"
+MY_DOMAIN_URL = "https://mciardullo-cogfy26-225-demo.my.salesforce.com"
+
 # Salesforce API URLs
-SALESFORCE_URL = "https://mciardullo-cogfy26-225-demo.my.salesforce.com"
-ACCESS_TOKEN_URL = f"{SALESFORCE_URL}/services/oauth2/token"
+BASE_URL = "https://api.salesforce.com/einstein/ai-agent/v1"
+SESSIONS_URL = f"{BASE_URL}/sessions"
+ACCESS_TOKEN_URL = f"{MY_DOMAIN_URL}/services/oauth2/token"
 
 
 class AgentforceAdapter:
     """
     Adapter for the Agentforce API.
     This adapter allows to interact with the Agentforce API: create a session, post a message, close a session.
+    See https://developer.salesforce.com/docs/einstein/genai/guide/agent-api-get-started.html for more details.
     """
 
     def __init__(self, client_id: str = None, client_secret: str = None):
@@ -104,7 +105,7 @@ class AgentforceAdapter:
         data = {
             "externalSessionKey": uuid_str,
             "instanceConfig": {
-                "endpoint": SALESFORCE_URL
+                "endpoint": MY_DOMAIN_URL
             },
             "streamingCapabilities": {
                 "chunkTypes": ["Text"]
@@ -115,7 +116,8 @@ class AgentforceAdapter:
         # print(data)
         # Convert data to json
         data_json = json.dumps(data)
-        response = requests.post(OPEN_SESSION_URL, headers=headers, data=data_json)
+        open_session_url = f"{BASE_URL}/agents/{AGENT_ID}/sessions"
+        response = requests.post(open_session_url, headers=headers, data=data_json)
         # print("---- Session:")
         # print(response.json())
         session_id = response.json()['sessionId']
@@ -130,12 +132,12 @@ class AgentforceAdapter:
         :return: Nothing
         """
         print("AgentforceAdapter: close_session called")
-        close_session_url = f"{CLOSE_SESSION_URL}/{session_id}"
+        session_url = f"{SESSIONS_URL}/{session_id}"
         headers = {
             "Authorization": f"Bearer {access_token}",
             "x-session-end-reason": "UserRequest",
         }
-        requests.delete(close_session_url, headers=headers)
+        requests.delete(session_url, headers=headers)
         print(f"    Session {session_id} closed:")
 
     def post_message(self, message: str, session_id: str = None, access_token: str = None) -> Dict[str, Any]:
@@ -156,7 +158,7 @@ class AgentforceAdapter:
         """
         if session_id in (None, "None"):
             session_id, access_token = self.create_session()
-        message_url = f"https://api.salesforce.com/einstein/ai-agent/v1/sessions/{session_id}/messages"
+        message_url = f"{SESSIONS_URL}/{session_id}/messages"
         print(f"---- Message URL: {message_url}")
         headers = {
             "Authorization": f"Bearer {access_token}",
