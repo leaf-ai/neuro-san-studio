@@ -7,14 +7,9 @@ import requests
 import uuid
 
 
-# Domain and agent IDs
-AGENT_ID = "0XxKc000000kvtXKAQ"
-MY_DOMAIN_URL = "https://mciardullo-cogfy26-225-demo.my.salesforce.com"
-
 # Salesforce API URLs
 BASE_URL = "https://api.salesforce.com/einstein/ai-agent/v1"
 SESSIONS_URL = f"{BASE_URL}/sessions"
-ACCESS_TOKEN_URL = f"{MY_DOMAIN_URL}/services/oauth2/token"
 
 
 class AgentforceAdapter:
@@ -24,14 +19,36 @@ class AgentforceAdapter:
     See https://developer.salesforce.com/docs/einstein/genai/guide/agent-api-get-started.html for more details.
     """
 
-    def __init__(self, client_id: str = None, client_secret: str = None):
+    def __init__(self,
+                 my_domain_url: str = None,
+                 agent_id: str = None,
+                 client_id: str = None,
+                 client_secret: str = None):
         """
         Constructs a Salesforce Agentforce Adapter.
         Uses the passed client_id, if any, or the AGENTFORCE_CLIENT_ID environment variable.
         Uses the passed client_secret, if any, or the AGENTFORCE_CLIENT_SECRET environment variable.
+        :param my_domain_url: the URL of the Agentforce domain or None to get it from the environment variables.
+        :param agent_id: the ID of the Agentforce agent or None to get it from the environment variables.
         :param client_id: the ID of the Agentforce client or None to get it from the environment variables.
         :param client_secret: the secret of the Agentforce client or None to get it from the environment variables.
         """
+        # Get the domain_url and agent_id from the environment variables if not provided
+        if my_domain_url is None:
+            print("AgentforceAdapter: getting AGENTFORCE_MY_DOMAIN_URL from environment variables...")
+            my_domain_url = os.getenv("AGENTFORCE_MY_DOMAIN_URL", None)
+            if my_domain_url is None:
+                print("AgentforceAdapter: AGENTFORCE_MY_DOMAIN_URL is NOT defined")
+            else:
+                print("AgentforceAdapter: my_domain_url found in environment variables")
+        if agent_id is None:
+            print("AgentforceAdapter: getting AGENTFORCE_AGENT_ID from environment variables...")
+            agent_id = os.getenv("AGENTFORCE_AGENT_ID", None)
+            if agent_id is None:
+                print("AgentforceAdapter: AGENTFORCE_AGENT_ID is NOT defined")
+            else:
+                print("AgentforceAdapter: agent_id found in environment variables")
+
         # Get the client_id and client_secret from the environment variables if not provided
         if client_id is None:
             print("AgentforceAdapter: getting AGENTFORCE_CLIENT_ID from environment variables...")
@@ -48,7 +65,7 @@ class AgentforceAdapter:
             else:
                 print("AgentforceAdapter: client_secret found in environment variables")
 
-        if client_id is None or client_secret is None:
+        if my_domain_url is None or agent_id is None or client_id is None or client_secret is None:
             print("ERROR: AgentforceAdapter is NOT configured. Please check your parameters or environment variables.")
             # The service is not configured. We cannot query the API, but we can still use mock responses.
             self.is_configured = False
@@ -56,6 +73,8 @@ class AgentforceAdapter:
             # The service is configured. We can query the API.
             self.is_configured = True
             # Keep track of the params
+            self.my_domain_url = my_domain_url
+            self.agent_id = agent_id
             self.client_id = client_id
             self.client_secret = client_secret
 
@@ -84,12 +103,12 @@ class AgentforceAdapter:
             'client_secret': self.client_secret,
             'grant_type': 'client_credentials'
         }
-        response = requests.post(ACCESS_TOKEN_URL, headers=headers, data=data)
+        access_token_url = f"{self.my_domain_url}/services/oauth2/token"
+        response = requests.post(access_token_url, headers=headers, data=data)
         access_token = response.json()['access_token']
         return access_token
 
-    @staticmethod
-    def _get_session(access_token: str) -> str:
+    def _get_session(self, access_token: str) -> str:
         """
         Calls the Salesforce API to get a session ID.
         :param access_token: an access token.
@@ -105,7 +124,7 @@ class AgentforceAdapter:
         data = {
             "externalSessionKey": uuid_str,
             "instanceConfig": {
-                "endpoint": MY_DOMAIN_URL
+                "endpoint": self.my_domain_url,
             },
             "streamingCapabilities": {
                 "chunkTypes": ["Text"]
@@ -116,7 +135,7 @@ class AgentforceAdapter:
         # print(data)
         # Convert data to json
         data_json = json.dumps(data)
-        open_session_url = f"{BASE_URL}/agents/{AGENT_ID}/sessions"
+        open_session_url = f"{BASE_URL}/agents/{self.agent_id}/sessions"
         response = requests.post(open_session_url, headers=headers, data=data_json)
         # print("---- Session:")
         # print(response.json())
