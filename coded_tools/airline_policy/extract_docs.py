@@ -9,7 +9,7 @@
 #
 from typing import Any, Dict, Union
 import os
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from neuro_san.interfaces.coded_tool import CodedTool
 
 
@@ -20,7 +20,7 @@ class ExtractDocs(CodedTool):
     """
     def __init__(self):
         self.default_path = ["coded_tools/airline_policy/knowdocs/Help Center.txt"]
-        
+
         self.docs_path = {
             "Bag Issues": "coded_tools/airline_policy/knowdocs/baggage/bag-issues",
             "Carry On Baggage": "coded_tools/airline_policy/knowdocs/baggage/carryon",
@@ -30,7 +30,7 @@ class ExtractDocs(CodedTool):
             "Military Personnel": "coded_tools/airline_policy/knowdocs/flight/military-personnel",
             "Mileage Plus": "coded_tools/airline_policy/knowdocs/flight/mileage-plus",
             "Basic Economy Restrictions": "coded_tools/airline_policy/knowdocs/flight/basic-econ",
-            
+
             "International Checked Baggage": "coded_tools/airline_policy/knowdocs/international",
             "Embargoes": "coded_tools/airline_policy/knowdocs/international",
         }
@@ -71,13 +71,13 @@ class ExtractDocs(CodedTool):
 
         if not isinstance(directory, (str, bytes, os.PathLike)):
             raise TypeError(f"Expected str, bytes, or os.PathLike object, got {type(directory).__name__} instead")
-        
+
         docs = {}
         for root, dirs, files in os.walk(directory):
             for file in files:
                 # Build the full path to the file
                 file_path = os.path.join(root, file)
-                
+
                 if file.lower().endswith(".pdf"):
                     # Extract PDF content
                     content = self.extract_pdf_content(file_path)
@@ -98,9 +98,9 @@ class ExtractDocs(CodedTool):
 
     def extract_pdf_content(self, pdf_path: str) -> str:
         """
-        Extract text from a PDF file using PyPDF2, while attempting to preserve
+        Extract text from a PDF file using pypdf, while attempting to preserve
         pagination (by inserting page headers).
-        
+
         :param pdf_path: Full path to the PDF file.
         :return: Extracted text from the PDF.
         """
@@ -123,7 +123,7 @@ class ExtractDocs(CodedTool):
     def extract_txt_content(self, txt_path: str) -> str:
         """
         Extract text from a plain text file.
-        
+
         :param txt_path: Full path to the TXT file.
         :return: Content of the text file.
         """
