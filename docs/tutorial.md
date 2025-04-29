@@ -505,7 +505,9 @@ Neuro-San supports the following data types:
 
 ```json
 {
-  "llm_config": {...},
+  "llm_config": {
+     "model_name": "gpt-4o"
+  },
   "tools": [
     {
       "name": "weather_agent",
@@ -556,7 +558,9 @@ class WeatherTool(CodedTool):
 
 ```json
 {
-  "llm_config": {...},
+  "llm_config": {
+     "model_name": "gpt-4o"
+  },
   "tools": [
     {
       "name": "datetime_agent",
