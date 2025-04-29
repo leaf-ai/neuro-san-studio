@@ -420,54 +420,170 @@ If you use other providers (e.g., Anthropic, OpenAI, Azure, etc.), simply adjust
 
 ---
 
-## 7. Coded Tools
+## 7. How to use tools in Neuro-San
 
-### What Are Coded Tools?
-Coded Tools are Python classes that implement the neuro_san.interfaces.coded_tool.CodedTool interface. Agents invoke these tools to perform specialized tasks (like calculations, database lookups, API calls, etc.) without relying on the LLM to do everything.
+Neuro-San supports two types of tools that agents can call during execution:
 
-### Adding a Coded Tool
-By convention, you create a subdirectory under coded_tools/ matching the HOCON filename. For example, for advanced_calculator.hocon, you can place custom tools in:
+1. **Prebuilt Tools** – Based on LangChain's `BaseTool`. These come with predefined behavior and do **not** require you to implement `CodedTool`.
+2. **Custom Tools** – Built using Neuro-San’s `CodedTool` interface. These allow you to define your own logic in Python and integrate it with the agent.
 
-```bash
-coded_tools/advanced_calculator/
-```
-Then, reference them in the HOCON file via the `"class"` field, e.g.:
+Use **Custom Tools** when your application needs behavior that isn't covered by the prebuilt options — such as accessing APIs, performing custom calculations, or interacting with internal systems.
 
-```hocon
-"class": "calculator_tool.CalculatorCodedTool"
-```
-Here, `calculator_tool.py` is placed in the `./coded_tools/advanced_calculator/` directory.
+### Custom Tools
 
-### Simple Calculator Tool
-Below is a simplified version of `calculator_tool.py`, supporting only `add`, `subtract`, `multiply`, and `divide`. (We omit error checks for brevity.)
+In Neuro-San, custom tool integration is done through **Coded Tools** — Python class that implement the `CodedTool` interface.
 
-```python
-from neuro_san.interfaces.coded_tool import CodedTool
+These tools allow agents to perform specialized operations like API calls, database queries, or computations that go beyond the LLM’s native capabilities.
 
-class CalculatorCodedTool(CodedTool):
-    def __init__(self):
-        self.MATH_FUNCTIONS = {
-            "add": lambda a, b: a + b,
-            "subtract": lambda a, b: a - b,
-            "multiply": lambda a, b: a * b,
-            "divide": lambda a, b: a / b if b != 0 else "Error: Division by zero"
+To integrate a custom tool, **you must define it in both HOCON and python files**:
+
+1. [**Agent Network (HOCON)**](#defining-functions-in-agent-network-hocon) – for configuration and orchestration  
+2. [**Python (Coded Tool)**](#defining-tool-in-python-coded-tool) – for actual implementation
+
+---
+
+#### Defining Functions in Agent Network (HOCON)
+
+Each tool must define a `function` block, and reference a Python `class`.
+>The **LLM provides values** for inputs defined in `function.parameters`.  
+However, users can **manually provide additional arguments** using the `args` field.
+
+- **`function`**
+  - `description`: Describes when and how to use the tool.
+  - `parameters`: Defines input arguments. Optional if no parameters are required.
+- **`class`**
+  - Python class reference in `module.Class` format.
+- **`args`**
+  - User-specified arguments that override or supplement LLM inputs. Optional.
+
+---
+
+#### Schema of Parameters
+
+Neuro-San supports the following data types:  
+`string`, `int`, `float`, `boolean`, `array` (list), `object` (dict)
+
+- `array` must include an `items` field to define the element type
+- `object` must include a `properties` field
+- The top-level `parameters` must always be an `object`
+
+| Field       | Description                                                                 |
+|-------------|-----------------------------------------------------------------------------|
+| `type`      | Must be `object`                                                            |
+| `properties`| Dict of argument names → each has a `type` and `description`               |
+| `required`  | List of required argument names                                             |
+
+---
+
+#### Defining Tool in Python (Coded Tool)
+
+- Inherit from `CodedTool`
+- Implement either `invoke` or `async_invoke`  
+  > Neuro-San prefers `async_invoke`, and falls back to `invoke` if unavailable
+- Access LLM and user-provided arguments via `args`
+
+#### Tool Path
+- The tool's path can be set via the environment variable:  
+  `AGENT_TOOL_PATH`
+
+- If not set, the default path is:  
+  `neuro_san/coded_tools`
+
+- A tool module placed in a folder that **matches the HOCON file name** (excluding `.hocon`)  
+  will be **scoped only to that specific agent network**.
+
+- To **reuse a tool across multiple networks**, place its module directly in the configured tool path (`AGENT_TOOL_PATH`).
+
+- This allows you to choose between:
+  - **Local tools** tied to one agent network, and  
+  - **Shared tools** accessible by multiple networks.
+
+---
+
+#### Example 1: Tool with parameters
+**HOCON**
+
+```json
+{
+  "llm_config": {...},
+  "tools": [
+    {
+      "name": "weather_agent",
+      "instructions": "Use your tool to provide weather report to the user.",
+      "tools": ["get_weather"]
+    },
+    {
+      "name": "get_weather",
+      "function": {
+        "description": "Provide weather at a given loaction.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "Location to provide weather for"
+            }
+          },
+          "required": ["location"]
         }
-
-    def invoke(self, args, sly_data):
-        operation = args.get("operation")
-        operands = args.get("operands", [])
-        func = self.MATH_FUNCTIONS.get(operation)
-        if not func:
-            return {"error": f"Unsupported operation: {operation}"}
-        if len(operands) < 2:
-            return {"error": "Not enough operands"}
-        result = func(operands[0], operands[1])
-        return {"operation": operation, "result": result}
+      },
+      "args": {
+        "current_weather": "cloudy"
+      },
+      "class": "weather_tool.WeatherTool"
+    }
+  ]
+}
 ```
 
-### Complex Calculator Tool
-A more complete version of the calculator (like the one in this tutorial’s introduction) uses a large dictionary of math functions, each associated with a Python function. It can handle multiple steps and advanced operations like `factorial`, `sin`, `log`, etc. Refer to the final code snippet in `calculator_tool.py` above.
+**Python**
+```python
+class WeatherTool(CodedTool):
 
+    def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]):
+        location = args.get("location")
+        current_weather = args.get("current_weather")
+
+        if current_weather:
+            return f"It is {current_weather} in {location}."
+        
+        return f"It is always sunny in {location}."
+```
+---
+
+#### Example 2: Tool with no parameters
+**HOCON**
+
+```json
+{
+  "llm_config": {...},
+  "tools": [
+    {
+      "name": "datetime_agent",
+      "instructions": "Use your tool to provide current date and time..",
+      "tools": ["current_date_time"]
+    },
+    {
+      "name": "current_date_time",
+      "function": {
+        "description": "Return current date and time."
+      },
+      "class": "date_time.DateTime"
+    }
+  ]
+}
+```
+
+**Python**
+```python
+class DateTime(CodedTool):
+
+    def invoke(self, args: Dict[str, Any], sly_data: Dict[str, Any]):
+        # Get current UTC time
+        now = datetime.now(timezone.utc)
+
+        return str(now)
+```
 ---
 
 ## 8. How to Access the Logs
