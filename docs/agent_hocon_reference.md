@@ -1,7 +1,7 @@
 # Agent Network HOCON File Reference
 
 This document describes the neuro-san specifications for a single agent network .hocon file
-as used for each [registiry](https://github.com/leaf-ai/neuro-san/tree/main/neuro_san/registries)
+as used for each [registry](https://github.com/leaf-ai/neuro-san/tree/main/neuro_san/registries)
 in the [neuro-san](https://github.com/leaf-ai/neuro-san) and [neuro-san-demos](https://github.com/leaf-ai/neuro-san-demos)
 repos.
 
@@ -12,8 +12,9 @@ format than that which you can explore on your own.
 
 Specifications in this docuent each have header changes for the depth of scope of the dictionary
 header they pertain to, starting with these sections:
-* [top-level](##top-level)
-* [single agent specification](##single-agent-specification)
+
+* [top-level](#top-level)
+* [single agent specification](#single-agent-specification)
 
 Some key descriptions refer to values that are dictionaries.
 Sub-keys to those dictionaries will be described in the next-level down scope from their parent.
@@ -130,7 +131,7 @@ own llms, see the [llm_info_hocon_reference](./llm_info_hocon_reference.md).
 
 #### fallbacks
 
-Fallbacks is a list of [llm_config](###llm-config) dictionaries to use in priority order.
+Fallbacks is a list of [llm_config](#llm-config) dictionaries to use in priority order.
 When the an llm_config in the list fails for any reason, the next in the list is tried.
 
 An simple example usage is given in [esp_decision_assistant.hocon](https://github.com/leaf-ai/neuro-san/blob/main/neuro_san/registries/esp_decision_assistant.hocon).
@@ -199,14 +200,14 @@ which might contain the following keys:
 | tool      | The name of the tool within the agent network that generated the error |
 | details   | Optional string descibing details of the error. Could include a Traceback, for instance|
 
-### error_fragments
+#### error_fragments
 
 A list of strings where if any one of the strings appears in agent output,
-it is considered an error and reported as such per the [error_formatter](###error-formatter)
+it is considered an error and reported as such per the [error_formatter](#error-formatter)
 
 ### tools
 
-A list/array of [single agent specifications](##single-agent-specification) that make up the agent network.
+A list/array of [single agent specifications](#single-agent-specification) that make up the agent network.
 
 The first of these in the list is called the "Front Man".
 He does all the dealings with any client of the agent.
@@ -215,7 +216,7 @@ Other agents listed can be in any order and can reference each other, forming tr
 
 Typically any agent that is not the front-man is considered an implementation detail private
 to the agent network definition.  If you find your agent networks have some shared functionality
-between them, consider elevating sub-networks to [external agent](####external-agents) status.
+between them, consider elevating sub-networks to [external agent](#external-agents) status.
 
 ## Single Agent Specification
 
@@ -232,7 +233,7 @@ This allows for snake_case, camelCase, kebab-case, PascalCase, or SCREAMING_SNAK
 human-readable names, however you like them.
 
 Any agent can refer to any other agent definition within the same agent network hocon file
-by using its name in its [tools](###tools) list.
+by using its name in its [tools](#tools) list.
 
 ### function
 
@@ -241,7 +242,7 @@ upstream caller.
 
 Neuro-san largely follows the
 [OpenAI function spec](https://platform.openai.com/docs/guides/function-calling?api-mode=responses#defining-functions),
-however we do not require redefining the "name" (that is already given [above](###name))
+however we do not require redefining the "name" (that is already given [above](#name))
 and we also do not require redefining the "type" as this is always the same for every agent.
 
 What is defined in this dictionary is what is returned for the agent's Function() neuro-san web API call.
@@ -264,7 +265,7 @@ is anticipated as being called from other agent networks.
 ##### type
 
 The type of the parameters dictionary is always "object".
-This lets the parsing system know that the [properties](#####properties) will be described as a dictionary.
+This lets the parsing system know that the [properties](#properties) will be described as a dictionary.
 
 ##### properties
 
@@ -287,7 +288,7 @@ See the definition of [cao_item in the esp_descision_assistant.hocon](https://gi
 
 ##### required
 
-This is an optional list of string keys in the [properties](#####properties) dictionary that are considered
+This is an optional list of string keys in the [properties](#properties) dictionary that are considered
 to be required whenever an upstream agent calls the one being described.
 Note that it's possible to specify a default value for any property that is not listed as required.
 
@@ -335,7 +336,7 @@ This enables entire ecosystems of agent webs.
 
 ### llm_config
 
-It is possible for any LLM-enabled agent description to also have its own [llm_config](###llm-config)
+It is possible for any LLM-enabled agent description to also have its own [llm_config](#llm-config)
 This allows for agents to use the right agent for the job. Some considerations for this might include:
 
 * Use of lower-cost LLMs for lighter (perhaps non-tool-using) jobs
@@ -365,7 +366,7 @@ Implementations of the CodedTool interface must have implementations which:
 * have a no-args constructor
 * at least implement the async_invoke() or the invoke() method.
 
-Agents representing CodedTools have the arguments described their [function parameters](#####parameters)
+Agents representing CodedTools have the arguments described their [function parameters](#parameters)
 populated by calling LLMs and passed in via the args dictionary of their async/invoke() method
 when they are invoked.  They are also passed the sly_data dictionary which contains
 private information not accessable to the chat stream.
@@ -400,7 +401,7 @@ Mid-level agents can have this be false to hide certain implementation details.
 
 #### to_downstream
 
-Dictionary which specifies security policy for information go *to* downstream [external agents](#####external-agents).
+Dictionary which specifies security policy for information go *to* downstream [external agents](#external-agents).
 
 ##### sly_data
 
@@ -412,7 +413,7 @@ By default no sly_data goes out to any external agent.
 
 #### from_downstream
 
-    Dictionary which specifies security policy for information coming *from* downstream [external agents](#####external-agents).
+    Dictionary which specifies security policy for information coming *from* downstream [external agents](#external-agents).
 
 ##### sly_data
 
@@ -446,10 +447,10 @@ topics frequently.
 
 ### error_formatter
 
-Same as top-level [error_formatter above](###error-formatter), except at single-agent scope.
+Same as top-level [error_formatter above](#error-formatter), except at single-agent scope.
 
 ### error_fragments
 
-Same as top-level [error_fragments above](###error-fragments), except at single-agent scope.
+Same as top-level [error_fragments above](#error-fragments), except at single-agent scope.
 
 ## LLM Config Specification
