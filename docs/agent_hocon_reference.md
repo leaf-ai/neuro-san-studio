@@ -317,7 +317,7 @@ and the context of its query.
 
 #### External Agents
 
-This is not a dictionary key, but more a description of a concept that relates to listings of tools.
+This is not a hocon file key, but more a description of a concept that relates to listings of tools.
 
 It is possible for any agent to reference another agent on the same server by adding a forward-slash
 in front of the served agent's name.  This is typically the stem of an agent network hocon file in
@@ -344,22 +344,105 @@ This allows for agents to use the right agent for the job. Some considerations f
 
 ### class
 
+Optional string specifying a Python class which implements the
+[CodedTool](https://github.com/leaf-ai/neuro-san/blob/main/neuro_san/interfaces/coded_tool.py)
+interface.
+
+Implementations must be found in the directory where the class can be resolved by looking
+under the AGENT_TOOL_PATH environment variable setting as part of the PYTHONPATH.
+By default neuro-san deployments assume that PYTHONPATH is set to contain the
+top-level of your project's repo and that AGENT_TOOL_PATH is set to "<top-level>/coded_tools".
+In that directory each agent has its own folder and the value of the class is resolved
+from there.
+
+For example:
+If the agent is called "math_guy" and the class is valued as "calculator.Calculator",
+The python file math_guy/calculator.py under AGENT_TOOL_PATH is expected to have
+a class called Calculator which implements the CodedTool interface.
+
+
+Implementations of the CodedTool interface must have implementations which:
+* have a no-args constructor
+* at least implement the async_invoke() or the invoke() method.
+
+Agents representing CodedTools have the arguments described their [function parameters](#####parameters)
+populated by calling LLMs and passed in via the args dictionary of their async/invoke() method
+when they are invoked.  They are also passed the sly_data dictionary which contains
+private information not accessable to the chat stream.
+
+Note that the CodedTool also has a synchronous invoke() method, but we discourage its use,
+as neuro-san is expected to run in an asynchronous multi-threaded environment.
+Using synchronous I/O calls within CodedTool implementations will result in loss of per-request
+agent parallelism and performance problems at scale.
+
 ### args
 
-_Only used for CodedTool and BaseTool agent descriptions._
+Args is an optional dictionary for agents representing CodedTools to pass other
+key/value pairs when the agent is invoked.  This allows for greater code sharing
+for a single CodedTool implementation when it is referenced by multiple agents
+and called in multiple contexts.
 
 ### allow
+
+An optional dictionary which controls security policy surrounding agent information flow.
+
 #### connectivity
+
+Boolean value which allows any agent within the network specification to control whether or
+not to report any downstream tools during a Connectivity() API call, which allow for
+pre-rendering of agent networks for demo/light-show purposes.
+
+The default value of true says "sure, report all my downstream tools".
+A false value does not allow such reporting.
+
+Turning this value to false at the front-man prevents any connectivity reporting from happening.
+Mid-level agents can have this be false to hide certain implementation details.
+
 #### to_downstream
+
+Dictionary which specifies security policy for information go *to* downstream [external agents](#####external-agents).
+
 ##### sly_data
+
+A dictionary value whose keys represent keys in the sly_data dictionary.
+Boolean values for each key tell whether or not that data is allowed to go through to external agents.
+A string value represents a translation to a new key.
+
+By default no sly_data goes out to any external agent.
+
 #### from_downstream
+
+    Dictionary which specifies security policy for information coming *from* downstream [external agents](#####external-agents).
+
 ##### sly_data
+
+A dictionary value whose keys represent keys in the sly_data dictionary.
+Boolean values for each key tell whether or not that data from any external agent
+is allowed to be accepted and merged into this agent's sly_data.
+A string value represents a translation to a new key.
+
 #### to_upstream
+
+_Front Man only_
+Dictionary which specifies security policy for information going back to any calling client.
+
 ##### sly_data
+
+A dictionary value whose keys represent keys in the sly_data dictionary.
+Boolean values for each key tell whether or not that data internal to the agent network
+is allowed to go back to the client in the final message.
+A string value represents a translation to a new key.
 
 ### max_message_history
 
 _Front Man only_
+
+An integer which tells the server how many of the most recent chat history messages
+to send back in its chat_context field which allows for continuing a conversation
+on the next client invocation.  By default this value is None, indicating there is no limit.
+
+This is useful when end-user conversations with agents are expected to be lengthy and/or change
+topics frequently.
 
 ### error_formatter
 
@@ -368,6 +451,5 @@ Same as top-level [error_formatter above](###error-formatter), except at single-
 ### error_fragments
 
 Same as top-level [error_fragments above](###error-fragments), except at single-agent scope.
-
 
 ## LLM Config Specification
