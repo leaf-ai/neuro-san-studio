@@ -10,18 +10,18 @@ for its data-driven configuration elements.  Very simply put, you can think of
 .hocon files as JSON files that allow comments, but there is more to the hocon
 format than that which you can explore on your own.
 
-Specifications in this docuent each have header changes for the depth of scope of the dictionary
+Specifications in this document each have header changes for the depth of scope of the dictionary
 header they pertain to, starting with these sections:
 
 * [top-level](#top-level)
 * [single agent specification](#single-agent-specification)
 
 Some key descriptions refer to values that are dictionaries.
-Sub-keys to those dictionaries will be described in the next-level down scope from their parent.
+Sub-keys to those dictionaries will be described in the next-level down heading scope from their parent.
 
 ## Top-Level Agent Network Specifications
 
-All parameters listed here have global score and are listed at the top of the file by convention.
+All parameters listed here have global scope (to the agent network) and are listed at the top of the file by convention.
 
 ### commondefs
 
@@ -31,9 +31,8 @@ A dictionary describing common definitions to be used throughout the particular 
 
 A commondefs dictionary where keys are strings to be found within braces within strings
 and the values of the dictionary are to replace those keys anywhere throughout the dictionary where string
-values are to be found.
+values are to be found.  Example:
 
-Example:
 ```
 {
     "commondefs": {
@@ -47,6 +46,7 @@ Example:
         "instructions": "Perform the {operation} operation."
 }
 ```
+
 This results in a final interpretation where the "instructions" value is "Perform the addition operation."
 
 Multiple passes are made for string replacements, so you can have string replacement values that also have
@@ -57,9 +57,8 @@ string replacement keys in them.
 A commondefs dictionary where keys are strings to be found as full-values (no braces) and the values
 of the dictionary are to replace those keys anywhere throughout the dictionary with the value defined
 whenever an exact match of the string value is found.
-values are to be found.
+values are to be found.  Example:
 
-Example:
 ```
 {
     "commondefs": {
@@ -80,10 +79,10 @@ Example:
 This results in a final interpretation where the "function" value is:
 
 ```
-        "function": {
-            "key1": "my_value",
-            "key2": 1.0
-        }
+"function": {
+    "key1": "my_value",
+    "key2": 1.0
+}
 ```
 
 Value replacement only happens once, but you can have replacement_strings references within
@@ -98,8 +97,8 @@ is to use an OpenAI gpt-4o model as the model_name for all agents.
 #### model_name
 
 The string model name to use for an agent in the network.
-When this is not present, the default model is "gpt-4o" which is a decent tool-using agent
-usable for most purposes.
+When this is not present, the default model is "gpt-4o" which is a decent all-purpose tool-using agent
+which gets job done but doesn't cost a ton.
 
 You can use any model listed in the [default_llm_info.hocon](https://github.com/leaf-ai/neuro-san/blob/main/neuro_san/internals/run_context/langchain/default_llm_info.hocon)
 file included with the neuro-san distribution without any further modification.
@@ -131,7 +130,7 @@ own llms, see the [llm_info_hocon_reference](./llm_info_hocon_reference.md).
 
 #### fallbacks
 
-Fallbacks is a list of [llm_config](#llm-config) dictionaries to use in priority order.
+Fallbacks is a list of [llm_config](#llm_config) dictionaries to use in priority order.
 When the an llm_config in the list fails for any reason, the next in the list is tried.
 
 An simple example usage is given in [esp_decision_assistant.hocon](https://github.com/leaf-ai/neuro-san/blob/main/neuro_san/registries/esp_decision_assistant.hocon).
@@ -145,7 +144,7 @@ An integer controlling the max_iterations of the langchain
 used for the agent.  Default is 20.
 
 We don't recommend deviating too far from the default of 20.
-Some folks find it useful to temporarily boost this waaaaay up when there is "network weather"
+Some folks find it useful to _temporarily_ boost this waaaaay up when there is "network weather"
 effecting your favorite LLM provider and you start to see "Agent stopped due to max iterations" errors.
 
 #### max_execution_seconds
@@ -157,7 +156,7 @@ used for the agent.  Default is set for 2 minutes.
 #### temperature
 
 Pretty much any of the LLMs will take a floating-point temperature parameter as an argument.
-Roughly speaking, temperature is a number between 0.0 and 1.0 that indicates randomness
+Roughly speaking, temperature is a number between 0.0 and 1.0 that indicates a relative amount of randomness
 in answers provided by the LLM.  By default this value is 0.7.
 
 #### Other LLM-specific Parameters
@@ -188,11 +187,11 @@ MAXIMAL.
 
 String value which describes which error formatter to use by default for any agent in the network.
 
-The default value is "string" which indicates that when errors arrive, they are reported upstream
+The default value is "string" which indicates that when errors occur, they are reported upstream
 in their original string format.
 
 An alternative value here is "json", which formats the error output into a predictable json dictionary
-which might contain the following keys:
+which contains the following keys:
 
 | Error Dictionary Key | Description |
 |:---------------------|:------------|
@@ -203,24 +202,26 @@ which might contain the following keys:
 #### error_fragments
 
 A list of strings where if any one of the strings appears in agent output,
-it is considered an error and reported as such per the [error_formatter](#error-formatter)
+it is considered an error and reported as such per the [error_formatter](#error-formatter).
 
 ### tools
 
 A list/array of [single agent specifications](#single-agent-specification) that make up the agent network.
 
 The first of these in the list is called the "Front Man".
-He does all the dealings with any client of the agent.
+He does handles all the dealings with any client of the agent network.
 
 Other agents listed can be in any order and can reference each other, forming trees or graphs.
 
 Typically any agent that is not the front-man is considered an implementation detail private
-to the agent network definition.  If you find your agent networks have some shared functionality
+to the agent network definition. It is not possible to call these internal agents except from within
+the agent network that defines them.  If you find your agent networks have some shared functionality
 between them, consider elevating sub-networks to [external agent](#external-agents) status.
 
 ## Single Agent Specification
 
-Settings for individual agents.
+Settings for individual agents are specified by their own dictionary within the list of [tools](#tools) for the network.
+
 There are a few settings that only apply to the front man.
 
 ### name
@@ -233,12 +234,12 @@ This allows for snake_case, camelCase, kebab-case, PascalCase, or SCREAMING_SNAK
 human-readable names, however you like them.
 
 Any agent can refer to any other agent definition within the same agent network hocon file
-by using its name in its [tools](#tools) list.
+by using its name in its [tools](#tools-agents) list.
 
 ### function
 
-A dictionary which describes what at agent can do and how it wished to be called for its
-upstream caller.
+A dictionary which describes what at agent can do and how it wishes to be invoked for the
+benefit of its upstream caller's planning.
 
 Neuro-san largely follows the
 [OpenAI function spec](https://platform.openai.com/docs/guides/function-calling?api-mode=responses#defining-functions),
@@ -252,14 +253,14 @@ What is defined in this dictionary is what is returned for the agent's Function(
 Every agent *must* have its function description filled out.
 This is a single string value which informs anything upstream as to what *this* agent can do for it.
 
-For a front-man, what is contained in this description often suffices as a prompt for the user.
+For a user-facing front-man, what is contained in this description often suffices as a prompt for the user.
 
 #### parameters
 
 Parameters contains an optional [JSON Schema](https://json-schema.org) dictionary describing what
 specific information the agent needs as input arguments when it is called.
 
-Front-man typically do not need parameters defined, unless the agent network being described
+A front-man typically does not need parameters defined, unless the agent network being described
 is anticipated as being called from other agent networks.
 
 ##### type
@@ -304,7 +305,7 @@ But if you expect an agent to use an LLM, this instructions field is a must.
 
 An optional string to set an LLM-enabled agent in motion.
 
-### tools
+### tools (agents)
 
 An optional list of strings with the names of other agents available for the agent being described to call.
 
@@ -337,11 +338,12 @@ This enables entire ecosystems of agent webs.
 ### llm_config
 
 It is possible for any LLM-enabled agent description to also have its own [llm_config](#llm-config)
-This allows for agents to use the right agent for the job. Some considerations for this might include:
+dictionary.  This allows for agents to use the right agent for the job.
+Some considerations might include:
 
 * Use of lower-cost LLMs for lighter (perhaps non-tool-using) jobs
 * Use of specially trained LLMs when subject matter expertise is required.
-* Use of sequestered LLMs when sensitive information is appropos to a single agent's chat stream.
+* Use of securely sequestered LLMs when sensitive information is appropos to a single agent's chat stream.
 
 ### class
 
@@ -363,8 +365,9 @@ a class called Calculator which implements the CodedTool interface.
 
 
 Implementations of the CodedTool interface must have implementations which:
+
 * have a no-args constructor
-* at least implement the async_invoke() or the invoke() method.
+* implement either the preferred async_invoke() or the discouraged synchronous invoke() method.
 
 Agents representing CodedTools have the arguments described their [function parameters](#parameters)
 populated by calling LLMs and passed in via the args dictionary of their async/invoke() method
@@ -385,7 +388,7 @@ and called in multiple contexts.
 
 ### allow
 
-An optional dictionary which controls security policy surrounding agent information flow.
+An optional dictionary which controls security policy pertaining to agent information flow.
 
 #### connectivity
 
@@ -402,37 +405,77 @@ Mid-level agents can have this be false to hide certain implementation details.
 #### to_downstream
 
 Dictionary which specifies security policy for information go *to* downstream [external agents](#external-agents).
+This has no effect on any information flowing between agents internal to the network.
 
 ##### sly_data
+
+By default no sly_data goes out to any external agent.
+To transmit sly_data to an external agent, you _must_ specificaly enable it.
 
 A dictionary value whose keys represent keys in the sly_data dictionary.
 Boolean values for each key tell whether or not that data is allowed to go through to external agents.
-A string value represents a translation to a new key.
+A string value in the dictionary represents a translation to a new key.
 
-By default no sly_data goes out to any external agent.
+Example:
+
+```
+    "allow": {
+        "to_downstream": {
+            "sly_data": {
+                "user_id": true,
+                "user_ssn": false,
+                "my_session": "session_id"
+            }
+        }
+    }
+```
+
+In simple sly_data situations you can simply specify which keys you want to allow
+as a list:
+
+```
+    "allow": {
+        "to_downstream": {
+            "sly_data": [ "user_id", "session_id" ]
+        }
+    }
+```
 
 #### from_downstream
 
-    Dictionary which specifies security policy for information coming *from* downstream [external agents](#external-agents).
+Dictionary which specifies security policy for information coming *from* downstream [external agents](#external-agents).
+This has no effect on any information flowing between agents internal to the network.
 
 ##### sly_data
+
+By default no sly_data is accepted from any external agent.
+To accept sly_data from an external agent, you _must_ specificaly enable it.
 
 A dictionary value whose keys represent keys in the sly_data dictionary.
 Boolean values for each key tell whether or not that data from any external agent
 is allowed to be accepted and merged into this agent's sly_data.
-A string value represents a translation to a new key.
+A string value in the dictionary represents a translation to a new key.
+
+The same dictionary/list specification described in [to_downstream](#sly_data) also applies here.
 
 #### to_upstream
 
 _Front Man only_
 Dictionary which specifies security policy for information going back to any calling client.
 
+This has no effect on any information flowing between agents internal to the network.
+
 ##### sly_data
+
+By default no sly_data goes back to the upstream caller from the agent network
+To transmit sly_data to its upstream caller, you _must_ specificaly enable it.
 
 A dictionary value whose keys represent keys in the sly_data dictionary.
 Boolean values for each key tell whether or not that data internal to the agent network
 is allowed to go back to the client in the final message.
-A string value represents a translation to a new key.
+A string value in the dictionary represents a translation to a new key.
+
+The same dictionary/list specification described in [to_downstream](#sly_data) also applies here.
 
 ### max_message_history
 
@@ -452,5 +495,3 @@ Same as top-level [error_formatter above](#error-formatter), except at single-ag
 ### error_fragments
 
 Same as top-level [error_fragments above](#error-fragments), except at single-agent scope.
-
-## LLM Config Specification
