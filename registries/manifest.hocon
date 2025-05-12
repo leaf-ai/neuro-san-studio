@@ -39,7 +39,7 @@
 
     # Before turn on and run the following agent network, make sure that:
     # crewai is installed
-    "crewai_research_report.hocon": false,
+    "crewai_research_report.hocon": true,
 
     # Before turn on and run the following agent network, make sure that:
     # The mcp server is running.

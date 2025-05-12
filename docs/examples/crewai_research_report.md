@@ -16,6 +16,7 @@ The **CrewAI Research Report** is a minimal agentic system demonstrating how to 
   ```bash
   pip install crewai
   ```
+  and edit `registries/manifest.hocon` to set "crewai_research_report.hocon": false, to true.
 
 ---
 

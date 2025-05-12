@@ -31,16 +31,16 @@ from pydantic import Field
 from neuro_san.interfaces.coded_tool import CodedTool
 
 
-class CrewaiResearchReport(CodedTool):
+class CrewAiResearchReport(CodedTool):
     """
-    CodedTool implementation which calculate BMI using a tool from mcp server
+    CodedTool implementation which response from crewai agents
     """
 
     async def async_invoke(
             self,
             args: Dict[str, Any],
             sly_data: Dict[str, Any]
-    ) -> float:
+    ) -> str:
         """
         Use CrewAI to perform research via web search and generate a report.
 
@@ -62,7 +62,7 @@ class CrewaiResearchReport(CodedTool):
 
             Keys expected for this implementation are:
                 None
-        :return: BMI or error message
+        :return: Report or error message
         """
         # Extract arguments from the input dictionary
         topic: str = args.get("topic")
